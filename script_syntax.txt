@@ -1,0 +1,159 @@
+########################################################################
+########################  SECTION 1: MANUAL  ###########################
+########################################################################
+
+Conventions
+===========
+
+Whenever you specify a FILE NAME, leave the file extension out! The 
+file "antika.bmp" becomes "antika". "npc3antikatown2.sc" becomes
+"npc3antikatown2". 
+
+When using MAPS, keep in mind that the MAP FILE NAME mustn't contain the
+file extension ".map" as well. ".ani" files are loaded automatically and
+they have to have the same name as the according map. This is a very 
+important convention, i.e. the program will crash when there's no ".ani"
+file for a ".map" file.
+
+Oh, and whenever I use QUOTATION MARKS in an argument's description,
+leave them out in the script! They're just there to separate the values
+from description text.
+
+Any script must contain a blank line in the end because BlitzBasic's
+ReadLine$() method didn't work when there's no new-line-character at
+the supposed end, which means the last line will be ignored when you
+forget to insert a blank line. Useful for one-line-comments.
+
+
+Animation-Files
+===============
+
+For each map there's an ANIMATION FILE. For "antikatown.map" there is
+a file called "antikatown.ani". This HAS TO be the case, if the .ani
+file is called differently, the program will crash because it can't
+find the correct file. Probably I'll implement a check so the program
+doesn't crash anymore. Either way, You won't be able to chose .ani 
+files manually -- they exist the way I designed the game or you're
+screwed :)
+
+The syntax is fairly simple and depends on the design of the tilesets
+a lot! Each line represents an animated tile with 4 parameters:
+  X Y START END
+
+X and Y are the tile-coordinates on the map. START and END define a
+RANGE IN THE TILESET -- so if START=111 and END=118 (like I use them in
+the town) the animation will iterate frames 111 to 118 in the tileset.
+Remember to count from 0, not from 1.
+
+
+How to implement map-teleporter
+===============================
+
+This one was screwed up a lot, I think.
+
+
+How to implement NPCs
+=====================
+
+Place static NPCs in the script which executes upon map initialisation.
+
+Use an file "npc#mapname.sc" to do something I don't understand yet.
+
+
+########################################################################
+###################  SECTION 2: SCRIPT SYNTAX  #########################
+########################################################################
+
+
+BLOCKKEYBOARD,value
+------------------------------------------------------------------------
+  Blocks all user's input. Value might indicate a direction or just a
+  status (on/off).
+  
+  value     I'm not sure yet ...
+
+
+CHECKFLAG,flagno,comp,val,tag
+------------------------------------------------------------------------
+  Checks a "flag" against a value. On success a GOTO will be executed,
+  on failure the parser will continue in the script.
+  
+  flagno    Number of flag in global game flag array.
+  comp      MT := >
+            LT := <
+            ST := == (I think I thought of "same than" x_x)
+  val       Value to compare against.
+  tag       GOTO-Tag to jump if check returns true.
+
+END
+------------------------------------------------------------------------
+  Ends script execution right here. Usually, the player re-gains control
+  over his character.
+
+
+FLAG,flagno,value
+------------------------------------------------------------------------
+  Sets a flag to a certain value.
+  
+  flagno    Number of the flag to be changed.
+  value     Numeric value to set the flag to.
+
+
+KOLLIDE,x,y,value
+------------------------------------------------------------------------
+  Here, the coordinates' syntax differs from PLAYERPOS. I don't know
+  why, though. Probably I was confused when I implemented this command.
+  
+  x         X-coordinate on the map to make a collision on
+  y         Y-coordinate to block
+  value     "1" or "0" represents "block" and "block off" accordingly.
+
+
+MAP,tileset,mapname
+------------------------------------------------------------------------
+  Loads a map.
+  
+  tileset   The filename of a tileset.
+  mapname   The filename of a map. Scripts and .ani files should be
+            titled accordingly, so this is a rather important part.
+
+
+MOVEPLAYER,dir
+------------------------------------------------------------------------
+  Moves the player character in a certain direction.
+  
+  dir       1 := down
+            2 := right
+
+
+PLAYERPOS,x y,dir
+------------------------------------------------------------------------
+  Warps a player to a certain position. This should only be used right
+  before loading a map and not during the game.
+  
+  x y       A pair of coordinates. Really don't use a comma, just
+            separate the two values with a space. X=12, Y=67 hence
+            becomes "12 67" (w/o quotation marks, of course).
+
+TAG,tagname
+------------------------------------------------------------------------
+  Defines a tag to which a GOTO or CHECKFLAG may jump in the script.
+  On loading, the tags shall be parsed from the script and stored in
+  an array/hash.
+  
+  tagname   Any alphanumerical value w/o special chars to identify
+            the line to which the parser shall jump.
+            
+
+TALK,name
+"line1"
+"line2"
+"line3"
+"line4"
+------------------------------------------------------------------------  
+  Displays a box of dialogue which MUST contain 4 Lines (use " " for 
+  empty lines!). The name of who speaks will be displayed on top of
+  the text (it's like a 5th line).
+  
+  This time, you HAVE TO use the quotation marks at beginning and end
+  of each line.
