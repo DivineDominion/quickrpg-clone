@@ -17,6 +17,8 @@ require './map'
 class Game < Gosu::Window
   include Gosu
   
+  attr_reader :show_debug
+  
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
     self.caption = 'QuickRPG Ruby Clone'
@@ -31,12 +33,14 @@ class Game < Gosu::Window
     @fps = 0
     @milliseconds = milliseconds()
     @show_fps = true
+    @show_debug = true
     
     cutter_bmp = Gosu::Image::load_tiles(self, "./gfx/sprites/cutter.png", 16, 16, true)
     
     @player = Player.new(2, 18, cutter_bmp)
     
     @map = Map::load(self, "antikatown", "antika", @player)
+    
   end
   
   def update
@@ -49,12 +53,12 @@ class Game < Gosu::Window
   end
   
   def draw
-    draw_background
+    draw_background if @show_debug
     
     draw_map
     
-    draw_fps
-    draw_rules
+    draw_fps if @show_fps
+    draw_rules if @show_debug
   end
   
 protected
@@ -62,6 +66,14 @@ protected
   def update_keyboard
     if Key::hit?(KbEscape)
       close
+    end
+    
+    if Key::hit?(KbF)
+      @show_fps = !@show_fps
+    end
+    
+    if Key::hit?(KbD)
+      @show_debug = !@show_debug
     end
   
     # Control player movement
@@ -83,6 +95,8 @@ protected
     unless @map.blocked_in_dir_from?(dir, @player.x, @player.y)
       @map.attempt_scrolling(dir)
       @player.walk_in(dir)
+    else
+      @player.turn_to(dir)
     end
   end
   
@@ -114,8 +128,8 @@ protected
   end
   
   def draw_rules
-    (1..15).each { |y| draw_line 0, y*16, 0x80000000, 320, y*16, 0x80000000}
-    (1..19).each { |x| draw_line x*16+1, 0, 0x80000000, x*16, 240, 0x80000000}
+    (1..15).each { |y| draw_line 0, y*16, 0x40000000, 320, y*16, 0x50000000, 10000}
+    (1..19).each { |x| draw_line x*16+1, 0, 0x50000000, x*16, 240, 0x50000000, 10000}
   end
 end
 

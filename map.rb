@@ -134,7 +134,7 @@ public
   attr_reader :width, :height
   
   CARET_BOUNDS = [7..13, 5..10]
-  NPC_DIRECTIONS = {0 => :down, 1 => :up, 2 => :left, 3 => :right}
+  NPC_DIRECTIONS = {1 => :down, 2 => :up, 3 => :left, 4 => :right}
     
   def initialize(wnd, map_header, tileset, player)
     @wnd = wnd
@@ -209,7 +209,7 @@ public
     active = args[0].to_i
     x, y = args[1].to_i, args[2].to_i
     move_type = args[3].to_i
-    dir = args[4].to_i
+    dir = args[4].to_i + 1 # Used to be "frames" and starting with 0
     offset = args[5].to_i
     # 6 and 7 unknown purpose
     timer = args[7].to_i
@@ -236,7 +236,7 @@ public
   def draw
     draw_tiles
     
-    draw_caret
+    draw_caret if @wnd.show_debug
   end
   
   def blocked_in_dir_from?(dir, x, y)
@@ -430,7 +430,7 @@ protected
   end
   
   def draw_caret
-    c = 0x40FF0000
+    c = 0x20FFFF00
     @wnd.draw_quad CARET_BOUNDS[0].first * TILE_SIZE, CARET_BOUNDS[1].first * TILE_SIZE, c,
       CARET_BOUNDS[0].last * TILE_SIZE, CARET_BOUNDS[1].first * TILE_SIZE, c,
       CARET_BOUNDS[0].first * TILE_SIZE, CARET_BOUNDS[1].last * TILE_SIZE, c,

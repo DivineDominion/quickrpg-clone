@@ -186,7 +186,10 @@ protected
   end
 end
 
-
+#
+# Only used to set Player.movement=:player to stop him from
+# animating while standing still.
+#
 class Player < Char
   def initialize(x, y, image)
     @movement = :player

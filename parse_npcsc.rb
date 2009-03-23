@@ -5,14 +5,21 @@ def open(fn)
   while not file.eof?
     b = file.readchar.to_i# if i < 32
 #    b = file.read(4).unpack("M") if i >= 32
-    c = b >= 50 ? b.chr : nil
+    c = b >= 49 ? b.chr : nil
     
-    print c unless c.nil?
-    print b if c.nil?
-    print " "
-    
+    if c.nil?
+      print "#{b}"
+      i += 1
+      print " "
+    else
+      print "#{c}*"
+      i = 0
+    end
+    if i >= 4
+      i = 0
+      print "||\n"
+    end
 
-    i += 1
   end
   
 rescue Exception
@@ -21,4 +28,4 @@ ensure
   file.close if defined? file && !file.nil?
 end
 
-open("data/npc3antikatown.sc")
+open("data/npc1antikatown.sc")
