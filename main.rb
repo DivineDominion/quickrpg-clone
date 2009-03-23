@@ -4,19 +4,18 @@
 require 'rubygems'
 require 'gosu'
 
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
+TILE_SIZE = 16
+SCREEN_WIDTH_TILE = 320 / TILE_SIZE
+SCREEN_HEIGHT_TILE = 240 / TILE_SIZE
+
 require './key'
 require './char'
+require './map'
 
 class Game < Gosu::Window
   include Gosu
-  
-  SCREEN_WIDTH = 320
-  SCREEN_HEIGHT = 240
-  TILE_SIZE = 16
-  SCREEN_WIDTH_TILE = 320 / TILE_SIZE
-  SCREEN_HEIGHT_TILE = 240 / TILE_SIZE
-  
-  attr_reader :scrolled_x, :scrolled_y
   
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
@@ -33,18 +32,11 @@ class Game < Gosu::Window
     @milliseconds = milliseconds()
     @show_fps = true
     
-    # Scrolling-Offsets
-    @scrolled_x = 0 unless defined? @scrolled_x
-    @scrolled_y = 0 unless defined? @scrolled_y
-    
-    # Set up map stuff
-    @characters = Hash.new unless defined? @characters
-    
     cutter_bmp = Gosu::Image::load_tiles(self, "./gfx/sprites/cutter.png", 16, 16, true)
     
-    @player = Char.new(0, 0, cutter_bmp)
+    @player = Char.new(2, 18, cutter_bmp)
     
-    add_character(@player)
+    @map = Map::load(self, "antikatown", "antika", @player)
   end
   
   def update
@@ -53,37 +45,19 @@ class Game < Gosu::Window
     
     update_keyboard
     
-    update_characters
+    update_map
   end
   
   def draw
     draw_background
     
-    draw_characters
+    draw_map
     
     draw_fps
     draw_rules
   end
   
-  def scrolled_tile_x
-    scrolled_x / TILE_SIZE
-  end
-  
-  def scrolled_tile_y
-    scrolled_y / TILE_SIZE
-  end
-  
-  def screen_dimension
-    {:width => ((scrolled_tile_x)..(scrolled_tile_x + SCREEN_WIDTH_TILE)),
-    :height => ((scrolled_tile_y)..(scrolled_tile_y + SCREEN_WIDTH_TILE))}
-  end
-  
-  
 protected
-  
-  def add_character(char)
-    @characters[char] = [char.x, char.y]
-  end
   
   def update_keyboard
     if Key::hit?(KbEscape)
@@ -93,24 +67,27 @@ protected
     # Control player movement
     unless @player.animating?
       if Key::down?(KbRight)
-        @player.walk_in(:right)
+        move_player(:right)
       elsif Key::down?(KbLeft)
-        @player.walk_in(:left)
+        move_player(:left)
       elsif Key::down?(KbUp)
-        @player.walk_in(:up)
+        move_player(:up)
       elsif Key::down?(KbDown)
-        @player.walk_in(:down)
+        move_player(:down)
       end
     end
   end
-
-  def update_characters
-    changed_chars = Hash.new
-    
-    # Update each char (move, animate, ...)
-    @characters.each do |char, coords|
-      @characters[char] = char.update
+  
+  def move_player(dir)
+    puts @map.blocked_in_dir_from?(dir, @player.x, @player.y)
+    unless @map.blocked_in_dir_from?(dir, @player.x, @player.y)
+      @map.attempt_scrolling(dir)
+      @player.walk_in(dir)
     end
+  end
+  
+  def update_map
+    @map.update unless @map.nil?
   end
 
   def update_fps
@@ -126,16 +103,11 @@ protected
   
   def draw_background
     draw_quad 0, 0, @bgcol, 320, 0, @bgcol, 0, 240, @bgcol, 320, 240, @bgcol
-  end
+  end  
   
-  def draw_characters    
-    @characters.each do |char, coords| 
-      char.draw if 
-        coords[0].between?(scrolled_tile_x, scrolled_tile_x + SCREEN_WIDTH_TILE) && 
-        coords[1].between?(scrolled_tile_y, scrolled_tile_y + SCREEN_HEIGHT_TILE)
-    end
+  def draw_map
+    @map.draw unless @map.nil?
   end
-  
   
   def draw_fps(x = 0.0, y = 0.0, color = 0xff000000)
     @debug_font.draw("FPS: " + @fps.to_s, x, y, 100.0, 1, 1, color)

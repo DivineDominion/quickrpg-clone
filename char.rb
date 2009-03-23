@@ -7,9 +7,10 @@ class Char
     :left => [6, 7],
     :right => [2, 3]
     }
-  FRAMESIZE = 16
+    
+  FRAMESIZE = TILE_SIZE
   
-  attr_reader :x, :y
+  attr_accessor :x, :y
   
   def initialize(x, y, image)
     @x = x
@@ -31,12 +32,19 @@ class Char
     return [@x, @y]
   end
   
+  def walking?
+    animating?
+  end
+  
   def animating?
     @animating
   end
   
-  def draw
-    @image.at(@frame).draw(@x * FRAMESIZE + @x_off, @y * FRAMESIZE + @y_off - (@jump ? -1 : 0), 10)
+  def draw(scrolled_x, scrolled_y)
+    @image.at(@frame).draw(
+      @x * FRAMESIZE + @x_off - scrolled_x, 
+      @y * FRAMESIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
+      100)
   end
   
   #
@@ -44,20 +52,42 @@ class Char
   #
   
   def turn_to(direction)
-    raise "animation not finished" if animating?
+    raise "animation not finished" if walking?
     
     @direction = direction
     @frame = Char::SPRITEANIM[@direction][0]
   end
   
   def walk_in(direction)
-    raise "walk_in called before finished" if animating?
+    raise "walk_in called before finished" if walking?
     
     # Reset animation
     turn_to(direction) if (@direction != direction)
 
     @step = 0
     @animating = true
+  end
+  
+  #
+  # Returns an [x,y]-array
+  #
+  def aim
+    raise "not walking at all" unless walking?
+    
+    case @direction
+    when :up
+      [@x, @y - 1]
+    when :down
+      [@x, @y + 1]
+    when :right
+      [@x + 1, @y]
+    when :left
+      [@x - 1, @y]
+    end
+  end
+  
+  def is_aim(x, y)
+    aim[0].eql?(x) && aim[1].eql?(y)
   end
   
 protected
