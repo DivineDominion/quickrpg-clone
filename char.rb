@@ -22,6 +22,7 @@ class Char
     @walking = false unless defined? @waking
     @animating = false unless defined? @animating
     
+    # When eql :npc the char will animate while standing still
     @movement = :npc unless defined? @movement
     
     turn_to(:down)
