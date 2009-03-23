@@ -49,13 +49,28 @@ Remember to count from 0, not from 1.
 How to implement map-teleporter
 ===============================
 
-This one was screwed up a lot, I think.
+This one was screwed up a lot. More about this later.
 
 
 How to implement NPCs
 =====================
 
-Place static NPCs in the script which executes upon map initialisation.
+Place static NPCs in the script which executes upon map initialisation:
+  
+  active? x y movement dir offset ??? ??? timer
+  frameset
+  
+    x         X-coordinate on map in tiles
+    y         Y-coordinate on map in tiles
+    movement  1 := walk -> movement script
+              2 := stand still
+    dir       0 := down
+              1 := up
+              2 := left
+              3 := right
+    offset    I think this is an y-offset in pixels
+    timer     Milliseconds between animation ticks, translates to
+              movement speed
 
 Use an file "npc#mapname.sc" to do something I don't understand yet.
 

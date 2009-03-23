@@ -34,7 +34,7 @@ class Game < Gosu::Window
     
     cutter_bmp = Gosu::Image::load_tiles(self, "./gfx/sprites/cutter.png", 16, 16, true)
     
-    @player = Char.new(2, 18, cutter_bmp)
+    @player = Player.new(2, 18, cutter_bmp)
     
     @map = Map::load(self, "antikatown", "antika", @player)
   end
@@ -65,7 +65,7 @@ protected
     end
   
     # Control player movement
-    unless @player.animating?
+    unless @player.walking?
       if Key::down?(KbRight)
         move_player(:right)
       elsif Key::down?(KbLeft)
@@ -79,7 +79,7 @@ protected
   end
   
   def move_player(dir)
-    puts @map.blocked_in_dir_from?(dir, @player.x, @player.y)
+#    puts @map.blocked_in_dir_from?(dir, @player.x, @player.y)
     unless @map.blocked_in_dir_from?(dir, @player.x, @player.y)
       @map.attempt_scrolling(dir)
       @player.walk_in(dir)

@@ -1,14 +1,12 @@
-
-
 class Char
-  SPRITEANIM = {
+  DIR_TO_FRAMES = {
     :up => [4, 5], 
     :down => [0, 1], 
     :left => [6, 7],
     :right => [2, 3]
     }
     
-  FRAMESIZE = TILE_SIZE
+  FRAME_SIZE = TILE_SIZE
   
   attr_accessor :x, :y
   
@@ -21,19 +19,38 @@ class Char
     
     @image = image
     
+    @walking = false unless defined? @waking
     @animating = false unless defined? @animating
+    
+    @movement = :npc unless defined? @movement
     
     turn_to(:down)
   end
   
   def update
-    animate! if animating?
+    if animating?
+      if animate!.eql?(:finished)
+        @animating = @movement.eql?(:npc)
+      end
+    end
+    
+    if walking?
+      if walk!.eql?(:finished)
+        # then just stop walking :)
+      end
+    end
+    
+    if @step >= 16
+      @step = 0
+    else
+      @step += 1
+    end
     
     return [@x, @y]
   end
   
   def walking?
-    animating?
+    @walking
   end
   
   def animating?
@@ -42,8 +59,8 @@ class Char
   
   def draw(scrolled_x, scrolled_y)
     @image.at(@frame).draw(
-      @x * FRAMESIZE + @x_off - scrolled_x, 
-      @y * FRAMESIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
+      @x * FRAME_SIZE + @x_off - scrolled_x, 
+      @y * FRAME_SIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
       100)
   end
   
@@ -52,20 +69,22 @@ class Char
   #
   
   def turn_to(direction)
-    raise "animation not finished" if walking?
+    raise "turn_to called while walking" if walking?
     
     @direction = direction
-    @frame = Char::SPRITEANIM[@direction][0]
+    @frame = Char::DIR_TO_FRAMES[@direction][0]
+    @animating = @movement.eql?(:npc)
+    @step = 0
   end
   
   def walk_in(direction)
-    raise "walk_in called before finished" if walking?
+    raise "walk_in called while walking" if walking?
     
     # Reset animation
-    turn_to(direction) if (@direction != direction)
+    turn_to(direction)
 
-    @step = 0
     @animating = true
+    @walking = true
   end
   
   #
@@ -91,9 +110,12 @@ class Char
   end
   
 protected
-  def animate!
+
+  def walk!
+    raise "not walking" unless walking?
+    
     if @step >= 16
-      @animating = false
+      @walking = false
       return :finished
     end
     
@@ -124,6 +146,15 @@ protected
       @x_off -= 16
       @x += 1
     end
+  end
+  
+  def animate!
+    raise "not animating" unless animating?
+    
+    if @step >= 16
+      #@animating = false
+      return :finished
+    end
     
     #0 q
     #1 q
@@ -142,15 +173,23 @@ protected
     #e q
     #f q
     
-    framenum = 1
-    # 1px "jump" when moving horizontally
-    @jump = [:left, :right].member? @direction
+    frame_step = 1
+    # 1px "jump" when walking (!!) horizontally
+    @jump = [:left, :right].member? @direction && walking?
     if @step.between?(0,3) || @step.between?(12, 15)
-      framenum = 0
+      frame_step = 0
       @jump = false
     end
     
-    @frame = SPRITEANIM[@direction][framenum]
-    @step += 1
+    @frame = DIR_TO_FRAMES[@direction][frame_step]
+  end
+end
+
+
+class Player < Char
+  def initialize(x, y, image)
+    @movement = :player
+    
+    super x, y, image
   end
 end

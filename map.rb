@@ -134,6 +134,7 @@ public
   attr_reader :width, :height
   
   CARET_BOUNDS = [7..13, 5..10]
+  NPC_DIRECTIONS = {0 => :down, 1 => :up, 2 => :left, 3 => :right}
     
   def initialize(wnd, map_header, tileset, player)
     @wnd = wnd
@@ -196,14 +197,25 @@ public
   def add_hotspot(x, y, script)
   end
   
+  #
+  # NpcAktiv X Y MoveType(Stehen, gehen) Frame Schiebung ??? SuckFunk Timer
+  #
   def add_npc(args, frameset)
-    # Remove "bmp" and create full path
+    # Remove "bmp" and create full path for image
     frameset = frameset[-3..-1].eql?("bmp") ? frameset[0..-5] : frameset
     img_path = File.join("gfx", "sprites", (frameset + ".png"))
     
+    # Give the arguments a name
+    active = args[0].to_i
     x, y = args[1].to_i, args[2].to_i
+    move_type = args[3].to_i
+    dir = args[4].to_i
+    offset = args[5].to_i
+    # 6 and 7 unknown purpose
+    timer = args[7].to_i
     
     char = Char.new(x, y, Gosu::Image::load_tiles(@wnd, img_path, 16, 16, true))
+    char.turn_to(NPC_DIRECTIONS[dir])
     
     add_character(char)
   end
