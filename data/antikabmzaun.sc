@@ -9,6 +9,7 @@ talk,cutter
 moveplayer,1
 end
 tag,a
+talk,cutter
 "..."
 " "
 " "
