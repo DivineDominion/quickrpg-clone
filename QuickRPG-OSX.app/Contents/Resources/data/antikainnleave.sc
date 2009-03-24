@@ -1,3 +1,3 @@
-playerpos,2 18,2
+playerpos,35 17,0
 map,antika,antikatown
 end
