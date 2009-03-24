@@ -191,9 +191,9 @@ end
 # animating while standing still.
 #
 class Player < Char
-  def initialize(x, y, image)
+  def initialize(image)
     @movement = :player
     
-    super x, y, image
+    super 0, 0, image
   end
 end

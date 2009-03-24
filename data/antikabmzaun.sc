@@ -6,7 +6,13 @@ talk,cutter
 "um den Buergermeister zu sehen."
 "Ich sollte mich erst im Gasthaus"
 "umschauen und nachfragen."
+talk,cutter
+"hey du"
+" "
+" "
+" "
 moveplayer,1
+blockkeyboard,2
 end
 tag,a
 talk,cutter

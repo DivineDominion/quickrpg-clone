@@ -1,17 +1,16 @@
-
 class Map
-  def self.load(wnd, filename, tileset_name, player)
+  def self.load(wnd, filename, tileset_name)
     tileset = Gosu::Image.load_tiles(
       wnd, File.join("gfx", "tilesets", tileset_name + ".png"), 
       TILE_SIZE, TILE_SIZE, true)
       
-    map = Map::initialize_map(wnd, filename, tileset, player)
-    Map::initialize_scripts(filename, map)
+    map = Map::initialize_map(wnd, filename, tileset)
+    Map::initialize_scripts(wnd, filename, map)
     
     return map
   end
   
-  def self.initialize_map(wnd, filename, tileset, player)
+  def self.initialize_map(wnd, filename, tileset)
     map_path = File.join("maps", (filename + ".map"))
     kol_path = File.join("maps", (filename + ".kol"))
     lyr_path = File.join("maps", (filename + ".lyr"))
@@ -29,7 +28,7 @@ class Map
     width = map_data[:width]
     height = map_data[:height]
     
-    map = Map.new(wnd, map_data, tileset, player)
+    map = Map.new(wnd, map_data, tileset)
     
     map.set_ground_layer      Map::load_layer_data(map_file, width, height)
     map.set_collision_layer   Map::load_layer_data(kol_file, width, height)
@@ -45,7 +44,7 @@ class Map
     lyr_file.close if defined? lyr_file && !lyr_file.nil?
   end
   
-  def self.initialize_scripts(filename, map)
+  def self.initialize_scripts(wnd, filename, map)
     ani_path = File.join "data", (filename + ".ani")
     scr_path = File.join "data", (filename + ".sc")
     
@@ -62,7 +61,7 @@ class Map
     num_hotspots.times do
       coords = scr_file.readline.strip.split(" ")
       script = scr_file.readline.strip
-    #  map.add_hotspot coords[0], coords[1], script
+      map.add_hotspot coords[0].to_i, coords[1].to_i, wnd.load_script(script)
     end
     
     # Neither do I know it here :(
@@ -132,14 +131,15 @@ public
   
   attr_reader :scrolled_x, :scrolled_y
   attr_reader :width, :height
+  attr_reader :flags
   
   CARET_BOUNDS = [7..13, 5..10]
   NPC_DIRECTIONS = {1 => :down, 2 => :up, 3 => :left, 4 => :right}
     
-  def initialize(wnd, map_header, tileset, player)
+  def initialize(wnd, map_header, tileset)
     @wnd = wnd
     @tileset = tileset
-    @player = player
+    @player = wnd.player
     
     @width = map_header[:width]
     @height = map_header[:height]
@@ -155,6 +155,9 @@ public
     # Set up map contents
     @animations = Array.new(@height).map { Array.new(@width) } unless defined? @animations
     @characters = Array.new(@height).map { Array.new(@width) } unless defined? @characters
+    @hotspots = Array.new(@height).map { Array.new(@width) } unless defined? @hotspots
+    @flags = Hash.new unless defined? @flags
+    @resume_line = 0 # script resuming
     
     @character_list = Hash.new unless defined? @character_list
     
@@ -195,6 +198,7 @@ public
   end
   
   def add_hotspot(x, y, script)
+    @hotspots[y][x] = script
   end
   
   #
@@ -223,6 +227,10 @@ public
   def add_character(char)
     @character_list[char] = [char.x, char.y]
     @characters[char.y][char.x] = char
+  end
+  
+  def set_collision(x, y, state)
+    @collision[y][x] = state ? 1 : 0
   end
   
   def update
@@ -261,6 +269,10 @@ public
       end
     end
     return false
+  end
+  
+  def hotspot_at(x, y)
+    return @hotspots[y][x]
   end
   
   def scrolled_tile_x
@@ -398,6 +410,10 @@ protected
         @character_list[char] = new_coords
         @characters[coords[1]][coords[0]] = nil
         @characters[new_coords[1]][new_coords[0]] = char
+        
+        if char.eql?(@player) && !(hotspot = hotspot_at(new_coords[0], new_coords[1])).nil?
+          @wnd.execute_script_soon(hotspot)
+        end
       end
     end
   end
@@ -424,18 +440,30 @@ protected
         @tileset.at(@ground[y][x]).draw         draw_x, draw_y, 10
         @tileset.at(@animations[y][x][2]).draw  draw_x, draw_y, 50 unless @animations[y][x].nil?
         @characters[y][x].draw                  @scrolled_x, @scrolled_y unless @characters[y][x].nil?
+        draw_hotspot                            x, y, draw_x, draw_y if @wnd.show_debug
         @tileset.at(@layer[y][x]).draw          draw_x, draw_y, 100
       end
     end
   end
   
   def draw_caret
-    c = 0x20FFFF00
+    c = 0x20FFFF80
     @wnd.draw_quad CARET_BOUNDS[0].first * TILE_SIZE, CARET_BOUNDS[1].first * TILE_SIZE, c,
       CARET_BOUNDS[0].last * TILE_SIZE, CARET_BOUNDS[1].first * TILE_SIZE, c,
       CARET_BOUNDS[0].first * TILE_SIZE, CARET_BOUNDS[1].last * TILE_SIZE, c,
       CARET_BOUNDS[0].last * TILE_SIZE, CARET_BOUNDS[1].last * TILE_SIZE, c,
       10000
+  end
+  
+  def draw_hotspot(x, y, draw_x, draw_y)
+    unless @hotspots[y][x].nil?
+      c = 0x80FFFF00
+      @wnd.draw_quad draw_x, draw_y, c,
+        draw_x + TILE_SIZE, draw_y, c,
+        draw_x, draw_y + TILE_SIZE, c,
+        draw_x + TILE_SIZE, draw_y + TILE_SIZE, c,
+        10000
+    end
   end
   
 =begin  
