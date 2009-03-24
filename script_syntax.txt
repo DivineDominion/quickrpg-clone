@@ -72,7 +72,28 @@ Place static NPCs in the script which executes upon map initialisation:
     timer     Milliseconds between animation ticks, translates to
               movement speed
 
-Use an file "npc#mapname.sc" to do something I don't understand yet.
+An example line:
+  
+  1 17 18 1 0 4 1 1 1100
+  npckid1.bmp
+
+This NPCs frameset is loaded from "npckid1" (actually: ".png", but
+the old Win32 executable relies on ".bmp" here).
+
+  1     NPC is active
+  17    X coordinate
+  18    Y coordinate
+  1     walking (should load a file for this)
+  0     Facing south
+  4     Y-Offset (which is currently implemented by default)
+  1     ???
+  1     ???
+  1100  Speed of movement (actually this should read "delay")
+
+Use a file called "npc#mapname.sc" to do something I don't understand yet.
+It SHOULD control an NPCs movement and contain script files to load
+when you want to talk to her. But then there's all that byte gibberish
+of which I can't imagine any meaningful purpose...
 
 
 ########################################################################
