@@ -1,6 +1,27 @@
-#!/usr/bin/ruby
-# Ensure ruby1.8 runs :(
+#
+# QuickRPG (Role Playing Game)---clone from my 2001 Blitz Basic project.
+# 
+# Copyright (C) 2009  Christian Tietze
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+#     christian.tietze@gmail.com
+#     <http://christiantietze.de/>
+#     <http://divinedominion.art-fx.org/>
+#
 
+# Made to work with Ruby1.8.x only 
 require 'rubygems'
 require 'gosu'
 
@@ -159,7 +180,6 @@ protected
   end
   
   def move_player(dir)
-#    puts @map.blocked_in_dir_from?(dir, @player.x, @player.y)
     unless @map.blocked_in_dir_from?(dir, @player.x, @player.y)
       @map.attempt_scrolling(dir)
       @player.walk_in(dir)
