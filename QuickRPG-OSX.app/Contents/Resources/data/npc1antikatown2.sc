@@ -1,22 +1,22 @@
 talk,Buerger
-"He! Ich bin ein laufender NPC mit"
-"Text im Script!!!"
+" Oi, I'm a moving NPC and there's"
+"text in my script! Ain't that cool?"
 " "
 " "
 talk,Cutter
-"Wow. Echt cool"
-" "
+"..."
+" Yeah, indeed. You rule"
 " "
 " "
 goto,hallo
 talk,DivineDominion
-"Script geht nicht wenn du"
-"das hier siehst :)"
+" You should never see this line. If"
+"you do, GOTO is broken :)"
 " "
 " "
 tag,hallo
 talk,Buerger
-"Yo. Kannst du laut sagen!"
-" "
-" "
+" Stick and stone may hurt me, but your"
+"words will do no harm!"
+"  Hahaha!"
 " "

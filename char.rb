@@ -19,8 +19,6 @@
 #     christian.tietze@gmail.com
 #     <http://christiantietze.de/>
 #     <http://divinedominion.art-fx.org/>
-#
-
 
 
 class Char
@@ -47,23 +45,15 @@ class Char
     @y_off = 0 unless defined? @y_off
     
     @image = image
+    @frame = 0
     
     @walking = false unless defined? @waking
     @animating = false unless defined? @animating
     
-    # When eql :npc the char will animate while standing still
-    @movement = :npc unless defined? @movement
-    
-    turn_to(:down)
+    @step = 0
   end
   
   def update
-    if animating?
-      if animate!.eql?(:finished)
-        @animating = @movement.eql?(:npc)
-      end
-    end
-    
     walk! if walking?
     
     if @step >= 16
@@ -92,15 +82,16 @@ class Char
   
   def turn_to(direction)
     raise "turn_to called while walking" if walking?
+    raise "turn_to called while animating" if animating?
     
     @direction = direction
     @frame = Char::DIR_TO_FRAMES[@direction][0]
-    @animating = true if @movement.eql?(:npc)
     @step = 0
   end
   
   def walk_in(direction)
     raise "walk_in called while walking" if walking?
+    raise "walk_in called while animating" if animating?
     
     # Reset animation
     turn_to(direction)
@@ -127,7 +118,7 @@ class Char
     end
   end
   
-  def is_aim(x, y)
+  def is_aim?(x, y)
     aim[0].eql?(x) && aim[1].eql?(y)
   end
   
@@ -174,7 +165,7 @@ protected
     raise "not animating" unless animating?
     
     if @step >= 16
-      #@animating = false
+      @animating = false
       return :finished
     end
     
@@ -191,17 +182,5 @@ protected
     end
     
     @frame = DIR_TO_FRAMES[@direction][frame_step]
-  end
-end
-
-#
-# Only used to set Player.movement=:player to stop him from
-# animating while standing still.
-#
-class Player < Char
-  def initialize(image)
-    @movement = :player
-    
-    super 0, 0, image
   end
 end

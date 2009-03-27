@@ -1,140 +1,169 @@
+#
+# QuickRPG (Role Playing Game)---clone from my 2001 Blitz Basic project.
+# 
+# Copyright (C) 2009  Christian Tietze
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+#     christian.tietze@gmail.com
+#     <http://christiantietze.de/>
+#     <http://divinedominion.art-fx.org/>
+#
+
 class Map
-  def self.load(wnd, filename, tileset_name)
-    tileset = Gosu::Image.load_tiles(
-      wnd, File.join("gfx", "tilesets", tileset_name + ".png"), 
-      TILE_SIZE, TILE_SIZE, true)
-      
-    map = Map::initialize_map(wnd, filename, tileset)
-    Map::initialize_scripts(wnd, filename, map)
-    
-    return map
-  end
-  
-  def self.initialize_map(wnd, filename, tileset)
-    map_path = File.join("maps", (filename + ".map"))
-    kol_path = File.join("maps", (filename + ".kol"))
-    lyr_path = File.join("maps", (filename + ".lyr"))
-    
-    raise ".map missing" unless File.exists?(map_path)
-    raise ".lyr missing" unless File.exists?(kol_path)
-    raise ".kol missing" unless File.exists?(lyr_path)
-    
-    map_file = File.open(map_path, "rb")
-    kol_file = File.open(kol_path, "rb")
-    lyr_file = File.open(lyr_path, "rb")
-    
-    map_data = Map::load_map_header(map_file)
-    
-    width = map_data[:width]
-    height = map_data[:height]
-    
-    map = Map.new(wnd, map_data, tileset)
-    
-    map.set_ground_layer      Map::load_layer_data(map_file, width, height)
-    map.set_collision_layer   Map::load_layer_data(kol_file, width, height)
-    map.set_transparent_layer Map::load_layer_data(lyr_file, width, height)
-    
-    return map
-  rescue Exception
-    puts "Loading the map was no success!"
-    raise
-  ensure
-    map_file.close if defined? map_file && !map_file.nil?
-    kol_file.close if defined? kol_file && !kol_file.nil?
-    lyr_file.close if defined? lyr_file && !lyr_file.nil?
-  end
-  
-  def self.initialize_scripts(wnd, filename, map)
-    ani_path = File.join "data", (filename + ".ani")
-    scr_path = File.join "data", (filename + ".sc")
-    
-    ani_file = File.open(ani_path, "rb")
-    scr_file = File.open(scr_path, "rb")
-    
-    ani_file.each_line do |line|
-      args = line.split(" ")
-      map.add_animation args[0].to_i, args[1].to_i, args[2].to_i, args[3].to_i
-    end
-    
-    # Don't REALLY know what this number is for ...
-    num_hotspots = scr_file.readline.strip.to_i + 1
-    num_hotspots.times do
-      coords = scr_file.readline.strip.split(" ")
-      script = scr_file.readline.strip
-      map.add_hotspot coords[0].to_i, coords[1].to_i, wnd.load_script(script)
-    end
-    
-    # Neither do I know it here :(
-    num_npcs = scr_file.readline.strip.to_i + 1
-    num_npcs.times do
-      args = scr_file.readline.strip.split(" ")
-      frameset = scr_file.readline.strip
-      map.add_npc args, frameset
-    end
-    
-  rescue Exception
-    puts "Script initialization failed."
-    raise
-  ensure
-    ani_file.close if defined? ani_file && !ani_file.nil?
-    scr_file.close if defined? scr_file && !scr_file.nil?
-  end
-  
-  
-  #
-  # Rotates the map arrays. I don't know why I did x-by-y back then.
-  #
-  def self.rotate_array(arr)
-    h = arr.length - 1
-    w = arr.first.length - 1
-
-    # Populate height*width array with nil
-    newarr = Array.new(h + 1).map { Array.new(w + 1) }
-
-    (0..w).each do |x|
-      (0..h).each do |y|
-        newarr[y][x] = arr[x][y]
-      end
-    end
-
-    return newarr
-  end
-  
-  #
-  # Reads map size and player position from a .map file
-  #
-  def self.load_map_header(file)
-    # width & height are array-lengths, not human-readable sizes
-    width = file.readchar.to_i + 1
-    height = file.readchar.to_i + 1
-    
-    return {
-      :width => width, :height => height, 
-      :start_x => file.readchar.to_i, :start_y => file.readchar.to_i
-      }
-  end
-  
-  #
-  # Loads array dara out of a file
-  #
-  def self.load_layer_data(file, width, height)
-    data = Array.new
-    width.times do
-      data << Array.new
-      height.times { data.last << file.readchar.to_i }
-    end
-    
-    return Map::rotate_array(data)
-  end
-  
-public
   
   attr_reader :scrolled_x, :scrolled_y
   attr_reader :width, :height
   attr_reader :flags
   
   CARET_BOUNDS = [7..13, 5..10]
-  NPC_DIRECTIONS = {1 => :down, 2 => :up, 3 => :left, 4 => :right}
+  
+  class << self
+    
+    def load(wnd, filename, tileset_name)
+      tileset = Gosu::Image.load_tiles(
+        wnd, File.join("gfx", "tilesets", tileset_name + ".png"), 
+        TILE_SIZE, TILE_SIZE, true)
+      
+      map = Map::initialize_map(wnd, filename, tileset)
+      Map::initialize_scripts(wnd, filename, map)
+    
+      return map
+    end
+  
+    def initialize_map(wnd, filename, tileset)
+      map_path = File.join("maps", (filename + ".map"))
+      kol_path = File.join("maps", (filename + ".kol"))
+      lyr_path = File.join("maps", (filename + ".lyr"))
+    
+      raise ".map missing" unless File.exists?(map_path)
+      raise ".lyr missing" unless File.exists?(kol_path)
+      raise ".kol missing" unless File.exists?(lyr_path)
+    
+      map_file = File.open(map_path, "rb")
+      kol_file = File.open(kol_path, "rb")
+      lyr_file = File.open(lyr_path, "rb")
+    
+      map_data = Map::load_map_header(map_file)
+    
+      width = map_data[:width]
+      height = map_data[:height]
+    
+      map = Map.new(wnd, map_data, tileset)
+    
+      map.set_ground_layer      Map::load_layer_data(map_file, width, height)
+      map.set_collision_layer   Map::load_layer_data(kol_file, width, height)
+      map.set_transparent_layer Map::load_layer_data(lyr_file, width, height)
+    
+      return map
+    rescue Exception
+      puts "Loading the map was no success!"
+      raise
+    ensure
+      map_file.close if defined? map_file && !map_file.nil?
+      kol_file.close if defined? kol_file && !kol_file.nil?
+      lyr_file.close if defined? lyr_file && !lyr_file.nil?
+    end
+  
+    def initialize_scripts(wnd, filename, map)
+      ani_path = File.join "data", (filename + ".ani")
+      scr_path = File.join "data", (filename + ".sc")
+    
+      ani_file = File.open(ani_path, "rb")
+      scr_file = File.open(scr_path, "rb")
+    
+      ani_file.each_line do |line|
+        args = line.split(" ")
+        map.add_animation args[0].to_i, args[1].to_i, args[2].to_i, args[3].to_i
+      end
+    
+      # Don't REALLY know what this number is for ...
+      num_hotspots = scr_file.readline.strip.to_i + 1
+      num_hotspots.times do
+        coords = scr_file.readline.strip.split(" ")
+        script = scr_file.readline.strip
+        map.add_hotspot coords[0].to_i, coords[1].to_i, wnd.load_script(script)
+      end
+    
+      # Neither do I know it here :(
+      num_npcs = scr_file.readline.strip.to_i + 1
+      npc_counter = 0
+      num_npcs.times do
+        npc_counter += 1
+        args = scr_file.readline.strip.split(" ")
+        frameset = scr_file.readline.strip
+        npc_filename = "npc#{npc_counter}#{filename}"
+        map.add_character(NPC::create_npc(wnd, args, frameset, npc_filename))
+      end
+    
+    rescue Exception
+      puts "Script initialization failed."
+      raise
+    ensure
+      ani_file.close if defined? ani_file && !ani_file.nil?
+      scr_file.close if defined? scr_file && !scr_file.nil?
+    end
+  
+  
+    #
+    # Rotates the map arrays. I don't know why I did x-by-y back then.
+    #
+    def rotate_array(arr)
+      h = arr.length - 1
+      w = arr.first.length - 1
+
+      # Populate height*width array with nil
+      newarr = Array.new(h + 1).map { Array.new(w + 1) }
+
+      (0..w).each do |x|
+        (0..h).each do |y|
+          newarr[y][x] = arr[x][y]
+        end
+      end
+
+      return newarr
+    end
+  
+    #
+    # Reads map size and player position from a .map file
+    #
+    def load_map_header(file)
+      # width & height are array-lengths, not human-readable sizes
+      width = file.readchar.to_i + 1
+      height = file.readchar.to_i + 1
+    
+      return {
+        :width => width, :height => height, 
+        :start_x => file.readchar.to_i, :start_y => file.readchar.to_i
+        }
+    end
+  
+    #
+    # Loads array dara out of a file
+    #
+    def load_layer_data(file, width, height)
+      data = Array.new
+      width.times do
+        data << Array.new
+        height.times { data.last << file.readchar.to_i }
+      end
+    
+      return Map::rotate_array(data)
+    end
+  end
+  
+public
     
   def initialize(wnd, map_header, tileset)
     @wnd = wnd
@@ -153,6 +182,7 @@ public
     @scrolled_y = 0 unless defined? @scrolled_y
     
     # Set up map contents
+    @ground = @layer = @collision = nil
     @animations = Array.new(@height).map { Array.new(@width) } unless defined? @animations
     @characters = Array.new(@height).map { Array.new(@width) } unless defined? @characters
     @hotspots = Array.new(@height).map { Array.new(@width) } unless defined? @hotspots
@@ -199,29 +229,6 @@ public
   
   def add_hotspot(x, y, script)
     @hotspots[y][x] = script
-  end
-  
-  #
-  # NpcAktiv X Y MoveType(Stehen, gehen) Frame Schiebung ??? SuckFunk Timer
-  #
-  def add_npc(args, frameset)
-    # Remove "bmp" and create full path for image
-    frameset = frameset[-3..-1].eql?("bmp") ? frameset[0..-5] : frameset
-    img_path = File.join("gfx", "sprites", (frameset + ".png"))
-    
-    # Give the arguments a name
-    active = args[0].to_i
-    x, y = args[1].to_i, args[2].to_i
-    move_type = args[3].to_i
-    dir = args[4].to_i + 1 # Used to be "frames" and starting with 0
-    offset = args[5].to_i
-    # 6 and 7 unknown purpose
-    timer = args[7].to_i
-    
-    char = Char.new(x, y, Gosu::Image::load_tiles(@wnd, img_path, 16, 16, true))
-    char.turn_to(NPC_DIRECTIONS[dir])
-    
-    add_character(char)
   end
   
   def add_character(char)
@@ -429,8 +436,8 @@ protected
     to_y = from_y + SCREEN_HEIGHT_TILE
     to_y = to_y >= @height ? @height - 1 : to_y
     
-    scroll_off_x = @scrolled_x - scrolled_tile_x * TILE_SIZE
-    scroll_off_y = @scrolled_y - scrolled_tile_y * TILE_SIZE
+    scroll_off_x = @scrolled_x % TILE_SIZE #- scrolled_tile_x * TILE_SIZE
+    scroll_off_y = @scrolled_y % TILE_SIZE # - scrolled_tile_y * TILE_SIZE
     
     (from_y .. to_y).each do |y|
       (from_x .. to_x).each do |x|

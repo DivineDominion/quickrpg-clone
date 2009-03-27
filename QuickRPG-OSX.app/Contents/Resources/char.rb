@@ -1,45 +1,60 @@
+#
+# QuickRPG (Role Playing Game)---clone from my 2001 Blitz Basic project.
+# 
+# Copyright (C) 2009  Christian Tietze
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+#     christian.tietze@gmail.com
+#     <http://christiantietze.de/>
+#     <http://divinedominion.art-fx.org/>
+
+
 class Char
+  # Translate direction symbols to frame-ranges
   DIR_TO_FRAMES = {
     :up => [4, 5], 
     :down => [0, 1], 
     :left => [6, 7],
     :right => [2, 3]
     }
-    
+  
+  # 16x16 Sprites on a 16x16 world supported only
   FRAME_SIZE = TILE_SIZE
   
   attr_accessor :x, :y
   
   def initialize(x, y, image)
+    # Tile position
     @x = x
     @y = y
     
+    # Offset on the tile, takes values from 0 to (TILE_SIZE-1)=15
     @x_off = 0 unless defined? @x_off
     @y_off = 0 unless defined? @y_off
     
     @image = image
+    @frame = 0
     
     @walking = false unless defined? @waking
     @animating = false unless defined? @animating
     
-    # When eql :npc the char will animate while standing still
-    @movement = :npc unless defined? @movement
-    
-    turn_to(:down)
+    @step = 0
   end
   
   def update
-    if animating?
-      if animate!.eql?(:finished)
-        @animating = @movement.eql?(:npc)
-      end
-    end
-    
-    if walking?
-      if walk!.eql?(:finished)
-        # then just stop walking :)
-      end
-    end
+    walk! if walking?
     
     if @step >= 16
       @step = 0
@@ -60,26 +75,23 @@ class Char
   
   def draw(scrolled_x, scrolled_y)
     @image.at(@frame).draw(
-      @x * FRAME_SIZE + @x_off - scrolled_x, 
-      @y * FRAME_SIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
+      @x * Char::FRAME_SIZE + @x_off - scrolled_x, 
+      @y * Char::FRAME_SIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
       100)
   end
   
-  #
-  # MOVEMENT METHODS
-  #
-  
   def turn_to(direction)
     raise "turn_to called while walking" if walking?
+    raise "turn_to called while animating" if animating?
     
     @direction = direction
     @frame = Char::DIR_TO_FRAMES[@direction][0]
-    @animating = @movement.eql?(:npc)
     @step = 0
   end
   
   def walk_in(direction)
     raise "walk_in called while walking" if walking?
+    raise "walk_in called while animating" if animating?
     
     # Reset animation
     turn_to(direction)
@@ -106,7 +118,7 @@ class Char
     end
   end
   
-  def is_aim(x, y)
+  def is_aim?(x, y)
     aim[0].eql?(x) && aim[1].eql?(y)
   end
   
@@ -153,26 +165,13 @@ protected
     raise "not animating" unless animating?
     
     if @step >= 16
-      #@animating = false
+      @animating = false
       return :finished
     end
     
-    #0 q
-    #1 q
-    #2 q
-    #3 q
-    #4 w
-    #5 w
-    #6 w
-    #7 w
-    #8 w
-    #9 w
-    #a w
-    #b w
-    #c q
-    #d q
-    #e q
-    #f q
+    # Movement/frame change patter
+    # @step #  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+    # frame #  0  0  0  0  1  1  1  1  1  1  1  0  0  0  0  0
     
     frame_step = 1
     # 1px "jump" when walking (!!) horizontally
@@ -183,17 +182,5 @@ protected
     end
     
     @frame = DIR_TO_FRAMES[@direction][frame_step]
-  end
-end
-
-#
-# Only used to set Player.movement=:player to stop him from
-# animating while standing still.
-#
-class Player < Char
-  def initialize(image)
-    @movement = :player
-    
-    super 0, 0, image
   end
 end

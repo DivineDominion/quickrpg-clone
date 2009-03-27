@@ -1,49 +1,44 @@
 checkflag,1,st,1,zwei
 talk,Buerger
-"AH! CUTTER! du bist es!"
-"lange nicht gesehen. Was hast"
-"du gemacht? Wie war die Reise?"
+" Yo, Cutter, long time no see!"
+"How ya doin? How was travelling?"
+" "
 " "
 talk,cutter
-"naja... war in ordnung. ich"
-"habe zwar nicht grade viel"
-"mitgebracht... aber immerhin"
-"gab es noch etwas."
+" Fine, thanks. Went to a few places and"
+"seen a few things. Wasn't a pleasure all"
+"the time. Streets got kinda dangerous"
+"'round 'ere."
 talk,Buerger
-"Oh. Gut. Ich schaue dann bei"
-"dir vorbei sobald Mira wieder"
-"da ist."
+" Glad these walls are sturdy, eh?"
+" (Guards do no good job after all, but"
+"that's no news for ya, is it?)"
 " "
 talk,cutter
-"*grinst* Mira... Ja... Ihr"
-"koennt mich ja nachher beide"
-"besuchen kommen. ich muss"
-"mich dann auch beeilen und"
-talk,cutter
-"den buergermeister nerven."
-" "
-" "
-" "
+" :)"
+" Not really."
+" Gotta go, lots of stuff to do and there's"
+"people I got to talk to soon."
 talk,Buerger
-"hehe. gut. ich komme nachher."
-"vielleicht hat mira dann auch"
-"zeit."
-" "
-talk,Buerger
-"also bis dann!"
-" "
-" "
-" "
+" See it in ya face, ya trouble yerself too much"
+"with other folks problems. Why dontcha calm"
+"down tonight, have a drink with old friends"
+"in the pub?"
 talk,Cutter
-"bis nachher!"
+" Maybe you're right. Just hope things keep calm"
+"'round here for s."
+" See ya later."
 " "
+talk,Buerger
+" 'course, come to the pub tonight, see ya"
+"'round!"
 " "
 " "
 flag,1,1
 end
 tag,zwei
 talk,Buerger
-"Ich komme dann nachher."
+" See ya tonight!"
 " "
 " "
 " "

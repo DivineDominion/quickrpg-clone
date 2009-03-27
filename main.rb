@@ -33,8 +33,11 @@ SCREEN_HEIGHT_TILE = 240 / TILE_SIZE
 
 require './key'
 require './char'
+require './player'
+require './npc'
 require './map'
 require './script'
+require './file'
 
 #
 # The Game-class serves as a window for the Gosu game library
