@@ -54,10 +54,9 @@ class Game < Gosu::Window
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
     self.caption = 'QuickRPG Ruby Clone'
     
-    Key::setup self
+    $wnd = self
     
     @debug_font = Font.new(self, 'Monaco', 12)
-    @bgcol = Color.new(255, 128, 128, 128)
     
     # Set up an FPS counter
     @fps_counter = 0
@@ -207,7 +206,8 @@ protected
   end
   
   def draw_background
-    draw_quad 0, 0, @bgcol, 320, 0, @bgcol, 0, 240, @bgcol, 320, 240, @bgcol
+    c = 0xFF808080
+    draw_quad 0, 0, c, SCREEN_WIDTH, 0, c, 0, SCREEN_HEIGHT, c, SCREEN_WIDTH, SCREEN_HEIGHT, c
   end  
   
   def draw_map
