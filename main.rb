@@ -31,6 +31,7 @@ TILE_SIZE = 16
 SCREEN_WIDTH_TILE = 320 / TILE_SIZE
 SCREEN_HEIGHT_TILE = 240 / TILE_SIZE
 
+require './fps'
 require './key'
 require './char'
 require './player'
@@ -38,6 +39,9 @@ require './npc'
 require './map'
 require './script'
 require './file'
+
+$show_fps = true
+$show_debug = true
 
 #
 # The Game-class serves as a window for the Gosu game library
@@ -55,24 +59,14 @@ class Game < Gosu::Window
     self.caption = 'QuickRPG Ruby Clone'
     
     $wnd = self
-    
-    @debug_font = Font.new(self, 'Monaco', 12)
-    
-    # Set up an FPS counter
-    @fps_counter = 0
-    @fps = 0
-    @milliseconds = milliseconds()
-    @show_fps = true
-    @show_debug = true
-    
-    cutter_bmp = Gosu::Image::load_tiles(self, File.join("gfx", "sprites", "cutter.png"), 16, 16, true)
+    $font = Font.new(self, 'Monaco', 12)
     
     @show_textbox = false
     @textbox_text = Array.new
     @textbox_img = Gosu::Image.new(self, File.join("gfx", "menu.png"), true)
     @font_img = Gosu::Image::load_tiles(self, File.join("gfx", "font.png"), 6, 6, true)
     
-    @player = Player.new(cutter_bmp)
+    @player = Player.new(Gosu::Image::load_tiles(self, File.join("gfx", "sprites", "cutter.png"), 16, 16, true))
     
     @map = nil
     @script = load_script "start"
@@ -80,7 +74,7 @@ class Game < Gosu::Window
   end
   
   def update
-    update_fps
+    FPS::tick milliseconds()
     Key::update
     
     update_controls
@@ -89,14 +83,14 @@ class Game < Gosu::Window
   end
   
   def draw
-    draw_background if @show_debug
+    draw_background if $show_debug
     
     draw_map
     
     draw_textbox if @show_textbox
     
-    draw_fps if @show_fps
-    draw_rules if @show_debug
+    draw_rules if $show_debug
+    FPS::draw if $show_fps
   end
   
   def use_map(map)
@@ -130,11 +124,11 @@ protected
     end
     
     if Key::hit?(KbF)
-      @show_fps = !@show_fps
+      $show_fps = !$show_fps
     end
     
     if Key::hit?(KbD)
-      @show_debug = !@show_debug
+      $show_debug = !$show_debug
     end
   
     if @show_textbox
@@ -193,17 +187,6 @@ protected
   def update_map
     @map.update unless @map.nil?
   end
-
-  def update_fps
-    @fps_counter += 1
-
-    if milliseconds() - @milliseconds >= 1000
-      @fps = @fps_counter
-  
-      @fps_counter = 0
-      @milliseconds = milliseconds
-    end
-  end
   
   def draw_background
     c = 0xFF808080
@@ -231,10 +214,6 @@ protected
       @font_img.at(b - 33).draw x, y, 20001
       x += 6
     end
-  end
-  
-  def draw_fps(x = 0.0, y = 0.0, color = 0xff000000)
-    @debug_font.draw("FPS: " + @fps.to_s, x, y, 100.0, 1, 1, color)
   end
   
   def draw_rules
