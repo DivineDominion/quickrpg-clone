@@ -180,6 +180,7 @@ public
     # Scrolling-Offsets
     @scrolled_x = 0 unless defined? @scrolled_x
     @scrolled_y = 0 unless defined? @scrolled_y
+    @scrolling  = false
     
     # Set up map contents
     @ground = @layer = @collision = nil
