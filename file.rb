@@ -43,7 +43,7 @@ class File
     length = readint
     result = ""
     # TODO unpack("%m") or so
-    length.times { result << readchar.chr } # FIXME readchar 1.9
+    length.times { result << readchar.chr }
     return result
   end
 end
