@@ -112,6 +112,7 @@ class NPC < Char
   
   def setup_movement(movement_pattern)
     @movement_pattern = movement_pattern
+    
     @movement_progress = 0
   end
   
@@ -122,6 +123,7 @@ class NPC < Char
   def progress_movement
     raise "animate_movement called while walking" if walking?
     raise "animate_movement called while animating" if animating? 
+    raise "movement not set up" if @movement_pattern == nil
     
     walk_in(NPC::NPC_DIRECTIONS[@movement_pattern[@movement_progress]])
     @movement_progress += 1

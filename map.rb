@@ -56,12 +56,12 @@ class Map
       lyr_file = File.open(lyr_path, "rb")
     
       map_data = Map::load_map_header(map_file)
-    
+
       width = map_data[:width]
       height = map_data[:height]
-    
+
       map = Map.new(wnd, map_data, tileset)
-    
+
       map.set_ground_layer      Map::load_layer_data(map_file, width, height)
       map.set_collision_layer   Map::load_layer_data(kol_file, width, height)
       map.set_transparent_layer Map::load_layer_data(lyr_file, width, height)
@@ -140,12 +140,12 @@ class Map
     #
     def load_map_header(file)
       # width & height are array-lengths, not human-readable sizes
-      width = file.readchar.to_i + 1
-      height = file.readchar.to_i + 1
-    
+      width = file.readbyte.to_i + 1
+      height = file.readbyte.to_i + 1
+      
       return {
         :width => width, :height => height, 
-        :start_x => file.readchar.to_i, :start_y => file.readchar.to_i
+        :start_x => file.readbyte.to_i, :start_y => file.readbyte.to_i
         }
     end
   
@@ -156,7 +156,7 @@ class Map
       data = Array.new
       width.times do
         data << Array.new
-        height.times { data.last << file.readchar.to_i }
+        height.times { data.last << file.readbyte.to_i }
       end
     
       return Map::rotate_array(data)
@@ -178,20 +178,20 @@ public
     @start_y = map_header[:start_y]
     
     # Scrolling-Offsets
-    @scrolled_x = 0 unless defined? @scrolled_x
-    @scrolled_y = 0 unless defined? @scrolled_y
+    @scrolled_x = 0
+    @scrolled_y = 0
     @scrolling  = false
     
     # Set up map contents
     @ground = @layer = @collision = nil
-    @animations = Array.new(@height).map { Array.new(@width) } unless defined? @animations
-    @characters = Array.new(@height).map { Array.new(@width) } unless defined? @characters
-    @hotspots = Array.new(@height).map { Array.new(@width) } unless defined? @hotspots
-    @flags = Hash.new unless defined? @flags
+    @animations = Array.new(@height).map { Array.new(@width) }
+    @characters = Array.new(@height).map { Array.new(@width) }
+    @hotspots = Array.new(@height).map { Array.new(@width) }
+    @flags = Hash.new
     @resume_line = 0 # script resuming
     
-    @character_list = Hash.new unless defined? @character_list
-    
+    @character_list = Hash.new
+
     add_character(@player)
     
     center_map_on(@player)

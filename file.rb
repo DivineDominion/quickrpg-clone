@@ -31,7 +31,7 @@ class File
   # Reads a 4 byte integer
   #
   def readint
-    read(4).unpack("i").to_s.to_i
+    read(4).unpack("i")[0]
   end
   
   #
@@ -43,7 +43,7 @@ class File
     length = readint
     result = ""
     # TODO unpack("%m") or so
-    length.times { result << readchar.chr}
+    length.times { result << readchar.chr } # FIXME readchar 1.9
     return result
   end
 end
