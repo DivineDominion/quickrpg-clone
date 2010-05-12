@@ -24,6 +24,7 @@
 # Made to work with Ruby1.8.x only 
 require 'rubygems'
 require 'gosu'
+require 'pp'
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
@@ -31,14 +32,37 @@ TILE_SIZE = 16
 SCREEN_WIDTH_TILE = 320 / TILE_SIZE
 SCREEN_HEIGHT_TILE = 240 / TILE_SIZE
 
+Z_GROUND  = 0b0000001
+Z_CHAR    = 0b0000010
+Z_LAYER   = 0b0000010 # = Z_CHAR so they don't always overlap
+Z_TEXTBOX = 0b1000000
+
+# Limits the keys which have to be checked by KeyEventDispatcher
+$supported_keys = [
+  K_ESC     = Gosu::KbEscape,
+  K_SPACE   = Gosu::KbSpace,
+  K_UP      = Gosu::KbUp,
+  K_DOWN    = Gosu::KbDown,
+  K_LEFT    = Gosu::KbLeft,
+  K_RIGHT   = Gosu::KbRight
+]
+
+require './Event'
+require './EventManager'
+
+require './KeyEventDispatcher' # generates key events
+require './KeyAdapter'
+
 require './fps'
-require './key'
+
+require './file'
+
 require './char'
 require './player'
 require './npc'
 require './map'
 require './script'
-require './file'
+require './textbox'
 
 $show_fps = true
 $show_debug = true
@@ -49,8 +73,9 @@ $show_debug = true
 #
 # For forther development I should consider
 #
+
 class Game < Gosu::Window
-  include Gosu
+  include Gosu, Singleton
   
   attr_reader :show_debug, :player, :map, :script
   
@@ -58,13 +83,14 @@ class Game < Gosu::Window
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
     self.caption = 'QuickRPG Ruby Clone'
     
+    EventManager::register(self)
+    @keep_going = true
+    
     $wnd = self
     $font = Font.new(self, 'Monaco', 12)
     
-    @show_textbox = false
-    @textbox_text = Array.new
-    @textbox_img = Gosu::Image.new(self, File.join("gfx", "menu.png"), true)
-    @font_img = Gosu::Image::load_tiles(self, File.join("gfx", "font.png"), 6, 6, true)
+    Textbox::textbox  = Gosu::Image.new(self, File.join("gfx", "menu.png"), true)
+    Textbox::font     = Gosu::Image::load_tiles(self, File.join("gfx", "font.png"), 6, 6, true)
     
     @player = Player.new(Gosu::Image::load_tiles(self, File.join("gfx", "sprites", "cutter.png"), 16, 16, true))
     
@@ -73,13 +99,30 @@ class Game < Gosu::Window
     @script.execute!
   end
   
+  def handle_event(event)
+    if event.instance_of? TickEvent
+      #update_controls
+    
+      update_map unless Textbox::open?
+    elsif event.instance_of? CharMoveRequest
+      unless @player.animating?
+        move_player(event.direction) 
+        player.moving_started = true
+      end
+    elsif event.instance_of? CharTileMoveDone
+      if event.source == player and player.moving_started? and not @player.animating?
+        move_player(event.direction) 
+      end
+    elsif event.instance_of? CharStopRequest
+      player.moving_started = false
+    elsif event.instance_of? QuitEvent
+      @keep_going = false
+    end
+  end
+  
   def update
-    FPS::tick milliseconds()
-    Key::update
-    
-    update_controls
-    
-    update_map unless @show_textbox
+    close unless @keep_going
+    EventManager::post(TickEvent.new(self, milliseconds()))
   end
   
   def draw
@@ -87,7 +130,7 @@ class Game < Gosu::Window
     
     draw_map
     
-    draw_textbox if @show_textbox
+    Textbox::draw
     
     draw_rules if $show_debug
     FPS::draw if $show_fps
@@ -98,6 +141,7 @@ class Game < Gosu::Window
   end
   
   def load_script(filename)
+    puts "make load_script() obsolete!"
     Script.new self, filename
   end
   
@@ -112,13 +156,15 @@ class Game < Gosu::Window
   # Sets up the engine to show a text box
   #
   def create_text_box(name, lines)
-    @textbox_text = ([name] + lines).map! {|l| l.upcase}
-    @show_textbox = true 
+    puts "make create_text_box() obsolete!"
+    Textbox::create(name.upcase, lines.map{|l| l.upcase})
   end
   
 protected
   
   def update_controls
+    raise "obsolete"
+    
     if Key::hit?(KbEscape)
       close
     end
@@ -131,9 +177,9 @@ protected
       $show_debug = !$show_debug
     end
   
-    if @show_textbox
+    if Textbox::open?
       if Key::hit?(KbSpace)
-        @show_textbox = false
+        Textbox::close
         
         # Resume execution after finishing the text box
         run_script
@@ -197,29 +243,17 @@ protected
     @map.draw unless @map.nil?
   end
   
-  def draw_textbox
-    @textbox_img.draw TILE_SIZE * 3, TILE_SIZE, 20000
-    y = TILE_SIZE * 2 - 2
-    draw_text_line_at(@textbox_text[0] + ":", TILE_SIZE * 4 - 2, y)
-    y+= 12
-    @textbox_text[1..-1].each do |line|
-      x = TILE_SIZE * 4 + 8
-      draw_text_line_at(line, x, y)
-      y += 6
-    end
-  end
-  
-  def draw_text_line_at(line, x, y)
-    line.each_byte do |b|
-      @font_img.at(b - 33).draw x, y, 20001
-      x += 6
-    end
-  end
-  
   def draw_rules
     (1..15).each { |y| draw_line 0, y*16, 0x40000000, 320, y*16, 0x50000000, 10000}
     (1..19).each { |x| draw_line x*16+1, 0, 0x50000000, x*16, 240, 0x50000000, 10000}
   end
 end
 
-Game.new.show
+game = Game.instance
+fps = FPS.instance
+keydispatcher = KeyEventDispatcher.instance
+keyadapter = KeyAdapter.new
+$wnd.show
+
+# main loop
+#game.run

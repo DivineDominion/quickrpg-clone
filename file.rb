@@ -31,7 +31,7 @@ class File
   # Reads a 4 byte integer
   #
   def readint
-    read(4).unpack("i").to_s.to_i
+    read(4).unpack("i")[0]
   end
   
   #

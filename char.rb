@@ -54,12 +54,16 @@ class Char
   end
   
   def update
-    walk! if walking?
+    state = walk! if walking?
     
     if @step >= 16
       @step = 0
     else
       @step += 1
+    end
+    
+    if state == :finished
+      EventManager.post(CharTileMoveDone.new(self, @direction))
     end
     
     return [@x, @y]
@@ -77,7 +81,7 @@ class Char
     @image.at(@frame).draw(
       @x * Char::FRAME_SIZE + @x_off - scrolled_x, 
       @y * Char::FRAME_SIZE + @y_off - (@jump ? 1 : 0) - scrolled_y - 6, 
-      100)
+      Z_CHAR)
   end
   
   def turn_to(direction)

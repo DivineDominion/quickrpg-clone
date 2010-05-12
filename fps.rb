@@ -21,27 +21,33 @@
 #     <http://divinedominion.art-fx.org/>
 #
 
+require 'singleton'
 
-#
-# Only used to set Player.movement=:player to stop him from
-# animating while standing still.
-#
-class Player < Char
-  attr_accessor :moving_started
+class FPS
+  include Singleton
   
-  def initialize(image)
-    super(0, 0, image)
-    
-    @moving_started = false
+  def self.draw(x = 0.0, y = 0.0, color = 0xff000000)
+    instance.draw(x, y, color)
   end
   
-  def moving_started?
-    @moving_started
+  def initialize
+    @fps_counter = 0
+    @fps = 0
+    @milliseconds = 0
   end
   
-  def update
-    animate! if animating?
+  def notify(event)
+    @fps_counter += 1
 
-    super
+    if event.millisecs - @milliseconds >= 1000
+      @fps = @fps_counter
+
+      @fps_counter = 0
+      @milliseconds = event.millisecs
+    end
+  end
+  
+  def draw(x, y, color)
+    $font.draw("FPS: " + @fps.to_s, x, y, 100.0, 1, 1, color)
   end
 end

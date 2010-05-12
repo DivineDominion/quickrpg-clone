@@ -24,8 +24,8 @@
 require 'singleton'
 require 'observer'
 
-class Key
-  include Singleton, Observable
+class KeyEventDispatcher
+  include Singleton
   
   # Sets up a shorthand and Maps each object method to a class method, 
   # e.g. write Key::state(id) instead of Key.instance.state(id)
@@ -49,22 +49,27 @@ class Key
   def initialize
     raise "Setup $wnd which must be instance_of? Gosu::Window" unless defined? $wnd
     
+    EventManager::register(self)
     @keys = Array.new(256, :released) 
+    
+    # Set up supported keys if not done already
+    $supported_keys ||= (0..255)
   end
   
-  def update
-    (0..255).each do |id|
-      old_state = state(id)
+  def handle_event(event)
+    if event.instance_of? TickEvent
+      $supported_keys.each do |id|
+        old_state = state(id)
       
-      if $wnd.button_down?(id)
-        button_down(id)
-      else
-        button_up(id)
-      end
-      
-      # Notify listeners on state changes
-      if state(id) != old_state
-        notify_observers(:key_event, id, state(id))
+        if $wnd.button_down?(id)
+          button_down(id)
+        else
+          button_up(id)
+        end
+        
+        if state(id) != old_state
+          EventManager.post(KeyEvent.new(self, state(id), id))
+        end
       end
     end
   end

@@ -140,12 +140,12 @@ class Map
     #
     def load_map_header(file)
       # width & height are array-lengths, not human-readable sizes
-      width = file.readchar.to_i + 1
-      height = file.readchar.to_i + 1
+      width = file.readbyte.to_i + 1
+      height = file.readbyte.to_i + 1
     
       return {
         :width => width, :height => height, 
-        :start_x => file.readchar.to_i, :start_y => file.readchar.to_i
+        :start_x => file.readbyte.to_i, :start_y => file.readbyte.to_i
         }
     end
   
@@ -156,7 +156,7 @@ class Map
       data = Array.new
       width.times do
         data << Array.new
-        height.times { data.last << file.readchar.to_i }
+        height.times { data.last << file.readbyte.to_i }
       end
     
       return Map::rotate_array(data)
@@ -444,11 +444,11 @@ protected
         draw_x = (x - from_x) * TILE_SIZE - scroll_off_x
         draw_y = (y - from_y) * TILE_SIZE - scroll_off_y
         
-        @tileset.at(@ground[y][x]).draw         draw_x, draw_y, 10
-        @tileset.at(@animations[y][x][2]).draw  draw_x, draw_y, 50 unless @animations[y][x].nil?
+        @tileset.at(@ground[y][x]).draw         draw_x, draw_y, Z_GROUND
+        @tileset.at(@animations[y][x][2]).draw  draw_x, draw_y, Z_GROUND unless @animations[y][x].nil?
         @characters[y][x].draw                  @scrolled_x, @scrolled_y unless @characters[y][x].nil?
         draw_hotspot                            x, y, draw_x, draw_y if @wnd.show_debug
-        @tileset.at(@layer[y][x]).draw          draw_x, draw_y, 100
+        @tileset.at(@layer[y][x]).draw          draw_x, draw_y, Z_LAYER
       end
     end
   end
