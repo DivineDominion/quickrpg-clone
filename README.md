@@ -12,13 +12,13 @@ the like, you know.
 KEY CONTROLS
 ============
 
-  [KEY]           [FUNCTION]
-  (arrow keys)    Control the player
-  space           Activate/trigger stuff in the world, make choices in text
-                  dialogues
-  esc             Quits the game
-  d	              Show/hide debug information (grid, hotspot markers etc)
-  f	              Show/hide frame rate
+    [KEY]           [FUNCTION]
+    (arrow keys)    Control the player
+    space           Activate/trigger stuff in the world, make choices in text
+                    dialogues
+    esc             Quits the game
+    d	              Show/hide debug information (grid, hotspot markers etc)
+    f	              Show/hide frame rate
 
 
 SOME INFO ON GRAPHICS
