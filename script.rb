@@ -1,4 +1,4 @@
-#
+  #
 # QuickRPG (Role Playing Game)---clone from my 2001 Blitz Basic project.
 # 
 # Copyright (C) 2009  Christian Tietze
@@ -21,7 +21,7 @@
 #     <http://divinedominion.art-fx.org/>
 #
 
-require 'scriptcommand'
+require './scriptcommand'
 
 class Script
   def self.create_command(cmd, args)
