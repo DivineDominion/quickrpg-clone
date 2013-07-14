@@ -5,7 +5,7 @@ gem 'rake'
 gem 'gosu', '~> 0.7.47'
 
 group :development do
-  gem 'rspec'
+  gem 'rspec', '~> 2.14'
   gem 'fuubar' # rspec style
   
   gem 'guard-rspec'
