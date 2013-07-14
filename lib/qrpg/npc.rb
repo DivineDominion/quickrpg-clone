@@ -11,7 +11,7 @@ class NPC < Char
     def create_npc(wnd, args, frameset, filename)
       # Remove "bmp" and create full path for image
       frameset = frameset[-3..-1].eql?("bmp") ? frameset[0..-5] : frameset
-      img_path = File.join("gfx", "sprites", (frameset + ".png"))
+      img_path = sprite_file_path(frameset + ".png")
       
       ## NpcActive? X Y Movement Frame Y-offset ??? ??? AnimationTimer
       
@@ -27,7 +27,7 @@ class NPC < Char
       npc = NPC.new(wnd, x, y, Gosu::Image::load_tiles(wnd, img_path, 16, 16, true))
       npc.turn_to(NPC_DIRECTIONS[dir])
       
-      filename = File.join("data", "#{filename}.sc")
+      filename = script_file_path("#{filename}.sc")
       if File.exists?(filename)
         movement_pattern, speak_script = parse_npc_script File.open(filename, "r")
         npc.setup_movement(movement_pattern)

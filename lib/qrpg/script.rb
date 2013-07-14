@@ -31,12 +31,10 @@ class Script
     end
   end
   
-  def initialize(wnd, filename)
-    path = File.join("data", "#{filename}.sc")
-    
+  def initialize(wnd, path)
     file = File.open(path, "r")
     
-    @filename = filename
+    @filename = File.basename(path)
     @wnd = wnd
     @tags = Hash.new unless defined? @tags
     @lines = Array.new unless defined? @lines
@@ -49,7 +47,7 @@ class Script
   rescue Exception
     raise
   ensure
-    file.close if defined? file && !file.nil?
+    file.close unless file.nil?
   end
   
   def suspended?
@@ -95,7 +93,7 @@ class Script
         @wnd.player.x, @wnd.player.y = line.x, line.y
         #@wnd.map.center_map_on @wnd.player
       when :tag
-        print "Tag command found upon execution, not cleaned by parser in #{line_num}:#{@filename}.sc.\n"
+        print "Tag command found upon execution, not cleaned by parser in #{line_num}:#{@filename}.\n"
       when :talk
         @wnd.create_text_box(line.name, line.lines)
         

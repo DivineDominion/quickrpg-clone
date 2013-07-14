@@ -2,6 +2,10 @@ require 'rubygems'
 require 'gosu'
 require 'pp'
 
+IMAGE_DIR = File.expand_path(File.join(__dir__, '..', '..', 'gfx'))
+SCRIPT_DIR = File.expand_path(File.join(__dir__, '..', '..', 'data'))
+MAP_DIR = File.expand_path(File.join(__dir__, '..', '..', 'maps'))
+
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
 TILE_SIZE = 16
@@ -50,6 +54,26 @@ $show_debug = true
 # For forther development I should consider
 #
 
+def sprite_file_path(filename)
+  File.join(IMAGE_DIR, 'sprites', filename)
+end
+
+def image_file_path(filename)
+  File.join(IMAGE_DIR, filename)
+end
+
+def tileset_file_path(filename)
+  File.join(IMAGE_DIR, 'tilesets', filename)
+end
+
+def script_file_path(filename)
+  File.join(SCRIPT_DIR, filename)
+end
+
+def map_file_path(filename)
+  File.join(MAP_DIR, filename)
+end
+
 class Game < Gosu::Window
   include Gosu, Singleton
   
@@ -57,7 +81,7 @@ class Game < Gosu::Window
   
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
-    self.caption = 'QuickRPG Ruby Clone'
+    self.caption = 'QuickRPG'
     
     EventManager::register(self)
     @keep_going = true
@@ -65,10 +89,10 @@ class Game < Gosu::Window
     $wnd = self
     $font = Font.new(self, 'Monaco', 12)
     
-    Textbox::textbox  = Gosu::Image.new(self, File.join("gfx", "menu.png"), true)
-    Textbox::font     = Gosu::Image::load_tiles(self, File.join("gfx", "font.png"), 6, 6, true)
+    Textbox::textbox  = Gosu::Image.new(self, image_file_path("menu.png"), true)
+    Textbox::font     = Gosu::Image::load_tiles(self, image_file_path("font.png"), 6, 6, true)
     
-    @player = Player.new(Gosu::Image::load_tiles(self, File.join("gfx", "sprites", "cutter.png"), 16, 16, true))
+    @player = Player.new(Gosu::Image::load_tiles(self, sprite_file_path("cutter.png"), 16, 16, true))
     
     @map = nil
     @script = load_script "start"
@@ -117,8 +141,7 @@ class Game < Gosu::Window
   end
   
   def load_script(filename)
-    puts "make load_script() obsolete!"
-    Script.new self, filename
+    Script.new self, script_file_path("#{filename}.sc")
   end
   
   #

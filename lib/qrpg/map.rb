@@ -10,7 +10,7 @@ class Map
     
     def load(wnd, filename, tileset_name)
       tileset = Gosu::Image.load_tiles(
-        wnd, File.join("gfx", "tilesets", tileset_name + ".png"), 
+        wnd, tileset_file_path(tileset_name + ".png"), 
         TILE_SIZE, TILE_SIZE, true)
       
       map = Map::initialize_map(wnd, filename, tileset)
@@ -20,9 +20,9 @@ class Map
     end
   
     def initialize_map(wnd, filename, tileset)
-      map_path = File.join("maps", (filename + ".map"))
-      kol_path = File.join("maps", (filename + ".kol"))
-      lyr_path = File.join("maps", (filename + ".lyr"))
+      map_path = map_file_path(filename + ".map")
+      kol_path = map_file_path(filename + ".kol")
+      lyr_path = map_file_path(filename + ".lyr")
     
       raise ".map missing" unless File.exists?(map_path)
       raise ".lyr missing" unless File.exists?(kol_path)
@@ -48,14 +48,14 @@ class Map
       puts "Loading the map was no success!"
       raise
     ensure
-      map_file.close if defined? map_file && !map_file.nil?
-      kol_file.close if defined? kol_file && !kol_file.nil?
-      lyr_file.close if defined? lyr_file && !lyr_file.nil?
+      map_file.close unless map_file.nil?
+      kol_file.close unless kol_file.nil?
+      lyr_file.close unless lyr_file.nil?
     end
   
     def initialize_scripts(wnd, filename, map)
-      ani_path = File.join "data", (filename + ".ani")
-      scr_path = File.join "data", (filename + ".sc")
+      ani_path = script_file_path(filename + ".ani") # TODO move somewhere else 2013-07-14
+      scr_path = script_file_path(filename + ".sc")
     
       ani_file = File.open(ani_path, "rb")
       scr_file = File.open(scr_path, "rb")
