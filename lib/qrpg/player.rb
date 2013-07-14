@@ -1,3 +1,5 @@
+require_relative 'char'
+
 module QuickRPG
   class Player < Char
     attr_accessor :moving_started

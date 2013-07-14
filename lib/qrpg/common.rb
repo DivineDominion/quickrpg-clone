@@ -1,6 +1,5 @@
 module QuickRPG
   module Common
-
     IMAGE_DIR = File.join(__dir__, '..', '..', 'gfx')
     SCRIPT_DIR = File.join(__dir__, '..', '..', 'data')
     MAP_DIR = File.join(__dir__, '..', '..', 'maps')
