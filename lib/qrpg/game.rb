@@ -17,6 +17,15 @@ require_relative 'map'
 require_relative 'script'
 require_relative 'textbox'
 
+$supported_keys = [
+  K_ESC     = Gosu::KbEscape,
+  K_SPACE   = Gosu::KbSpace,
+  K_UP      = Gosu::KbUp,
+  K_DOWN    = Gosu::KbDown,
+  K_LEFT    = Gosu::KbLeft,
+  K_RIGHT   = Gosu::KbRight
+]
+
 module QuickRPG
   class Game < Gosu::Window
     include Gosu, Singleton
@@ -63,6 +72,10 @@ module QuickRPG
       end
     end
   
+    def button_down(id)
+      puts id
+    end
+    
     def update
       close unless @keep_going
       EventManager::post(TickEvent.new(self, milliseconds()))
