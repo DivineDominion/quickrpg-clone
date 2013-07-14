@@ -1,5 +1,15 @@
+require 'gosu'
 require 'singleton'
 require 'observer'
+
+$supported_keys = [
+  K_ESC     = Gosu::KbEscape,
+  K_SPACE   = Gosu::KbSpace,
+  K_UP      = Gosu::KbUp,
+  K_DOWN    = Gosu::KbDown,
+  K_LEFT    = Gosu::KbLeft,
+  K_RIGHT   = Gosu::KbRight
+]
 
 module QuickRPG
   class KeyEventDispatcher

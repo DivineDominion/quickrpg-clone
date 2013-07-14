@@ -1,4 +1,4 @@
-GAME_FILE = File.join(__dir__, 'lib', 'qrpg', 'main.rb')
+GAME_FILE = File.join(__dir__, 'app', 'main.rb')
 
 desc "Run game"
 task :run do

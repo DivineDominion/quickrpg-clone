@@ -23,6 +23,6 @@ Spork.each_run do
   lib_folder = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
   Dir["#{lib_folder}/**/*.rb"].each do |file|
     puts file
-    require file unless File.basename(file) == "main.rb"
+    require file
   end
 end
