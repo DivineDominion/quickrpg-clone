@@ -4,6 +4,8 @@ require_relative 'event'
 require_relative 'event_manager'
 
 require_relative 'key_event_adapter'
+require_relative 'key_event_broadcaster'
+
 require_relative 'key_adapter'
 
 require_relative 'fps'
@@ -43,7 +45,10 @@ module QuickRPG
       @script = load_script "start"
       @script.execute!
       
-      @key_event_adapter = KeyEventAdapter.new(Common::SUPPORTED_KEYS)
+      
+      @key_event_adapter = KeyEventBroadcaster.new(
+        KeyEventAdapter.new(Common::SUPPORTED_KEYS))
+        
       EventManager::register(KeyAdapter.new)
     end
   

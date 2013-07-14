@@ -1,12 +1,12 @@
-require 'observer'
-
-require_relative 'event_manager'
+# = key_event_adapter.rb - Semantic key states
+#
+# Makes :hit, :down, :up, :released key states available for querying.
 
 module QuickRPG
   class KeyEventAdapter
     attr_reader :keys
     
-    def initialize(supported_keys)
+    def initialize(supported_keys = (0..255))
       @keys = {}
       
       supported_keys.each do |key|
@@ -15,27 +15,15 @@ module QuickRPG
     end
   
     def button_down(id)
-      old_state = keys[id]
-      
       keys[id] = :down  if hit? id
       keys[id] = :hit   if released? id
-      
-      new_state = keys[id]
-      
-      key_changed(id, new_state) if old_state != new_state
     end 
   
     def button_up(id)
-      old_state = keys[id]
-      
       keys[id] = :released  if up? id
       keys[id] = :up        if down? id
-      
-      new_state = keys[id]
-      
-      key_changed(id, new_state) if old_state != new_state
     end
-
+    
     def hit?(id)
       keys[id] == :hit
     end
@@ -54,10 +42,6 @@ module QuickRPG
   
     def state(id)
       keys[id]
-    end
-    
-    def key_changed(key, changed_to)
-      EventManager.post(KeyEvent.new(self, changed_to, key))
     end
   end
 end
