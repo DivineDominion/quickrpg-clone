@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-shared_examples "a button listener interface" do
+shared_examples "a keyboard listener interface" do
   let(:listener) { described_class.new }
   
   it "implements button press" do
