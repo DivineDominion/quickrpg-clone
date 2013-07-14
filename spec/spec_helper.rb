@@ -1,5 +1,9 @@
 require 'rubygems'
 require 'spork'
+
+# Add spec/ to LOAD_PATH manually because guard/spork fired it :(
+$:.unshift(File.expand_path(__dir__))
+
 #uncomment the following line to use spork with the debugger
 #require 'spork/ext/ruby-debug'
 
@@ -17,12 +21,10 @@ Spork.prefork do
   end
 end
 
+lib_folder = File.expand_path(File.join(__dir__, '..', 'lib'))
+spec_folder = File.expand_path(__dir__)
+
 Spork.each_run do
-  # This code will be run each time you run your specs.
-  
-  lib_folder = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-  Dir["#{lib_folder}/**/*.rb"].each do |file|
-    puts file
-    require file
-  end
+  Dir["#{lib_folder}/**/*.rb"].each { |f| require f }
+  Dir["#{spec_folder}/support/**/*.rb"].sort.each { |f| require f }
 end
