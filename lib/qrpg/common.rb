@@ -1,3 +1,5 @@
+require 'gosu' # required for the keys
+
 module QuickRPG
   module Common
     IMAGE_DIR = File.join(__dir__, '..', '..', 'gfx')
