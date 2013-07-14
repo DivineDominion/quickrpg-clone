@@ -1,10 +1,8 @@
-require 'rubygems'
 require 'gosu'
-require 'pp'
 
-IMAGE_DIR = File.expand_path(File.join(__dir__, '..', '..', 'gfx'))
-SCRIPT_DIR = File.expand_path(File.join(__dir__, '..', '..', 'data'))
-MAP_DIR = File.expand_path(File.join(__dir__, '..', '..', 'maps'))
+IMAGE_DIR = File.join(__dir__, '..', '..', 'gfx')
+SCRIPT_DIR = File.join(__dir__, '..', '..', 'data')
+MAP_DIR = File.join(__dir__, '..', '..', 'maps')
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
@@ -27,7 +25,7 @@ $supported_keys = [
   K_RIGHT   = Gosu::KbRight
 ]
 
-require_relative 'Event'
+require_relative 'event'
 require_relative 'event_manager'
 
 require_relative 'key_event_dispatcher' # generates key events
@@ -46,13 +44,6 @@ require_relative 'textbox'
 
 $show_fps = true
 $show_debug = true
-
-#
-# The Game-class serves as a window for the Gosu game library
-# and controls basic game mechanics.
-#
-# For forther development I should consider
-#
 
 def sprite_file_path(filename)
   File.join(IMAGE_DIR, 'sprites', filename)
@@ -80,7 +71,7 @@ class Game < Gosu::Window
   attr_reader :show_debug, :player, :map, :script
   
   def initialize
-    super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 20)
+    super(SCREEN_WIDTH*2, SCREEN_HEIGHT*2, false, 20)
     self.caption = 'QuickRPG'
     
     EventManager::register(self)
@@ -127,11 +118,11 @@ class Game < Gosu::Window
   
   def draw
     draw_background if $show_debug
-    
+
     draw_map
-    
+  
     Textbox::draw
-    
+  
     draw_rules if $show_debug
     FPS::draw if $show_fps
   end
