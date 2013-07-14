@@ -21,7 +21,7 @@
 #     <http://divinedominion.art-fx.org/>
 #
 
-require 'scriptcommand'
+require './scriptcommand'
 
 class Script
   def self.create_command(cmd, args)
