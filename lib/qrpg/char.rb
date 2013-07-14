@@ -28,6 +28,8 @@ class Char
     @animating = false unless defined? @animating
     
     @step = 0
+    
+    @jump = false
   end
   
   def update
