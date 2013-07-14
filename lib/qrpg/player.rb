@@ -1,19 +1,21 @@
-class Player < Char
-  attr_accessor :moving_started
+module QuickRPG
+  class Player < Char
+    attr_accessor :moving_started
   
-  def initialize(image)
-    super(0, 0, image)
+    def initialize(image)
+      super(0, 0, image)
     
-    @moving_started = false
-  end
+      @moving_started = false
+    end
   
-  def moving_started?
-    @moving_started
-  end
+    def moving_started?
+      @moving_started
+    end
   
-  def update
-    animate! if animating?
+    def update
+      animate! if animating?
 
-    super
+      super
+    end
   end
 end

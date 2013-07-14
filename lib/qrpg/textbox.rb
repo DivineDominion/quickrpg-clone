@@ -41,7 +41,7 @@ class Textbox
     end
   
     def draw
-      @@textbox.draw 16 * 3, 16, Z_TEXTBOX
+      @@textbox.draw 16 * 3, 16, Common::Z_TEXTBOX
   
       y = 16 * 2 - 2
   
@@ -60,7 +60,7 @@ class Textbox
   
     def draw_text_line_at(line, x, y)
       line.each_byte do |b|
-        @@font.at(b - 33).draw x, y, Z_TEXTBOX + 1
+        @@font.at(b - 33).draw x, y, Common::Z_TEXTBOX + 1
         x += 6
       end
     end
