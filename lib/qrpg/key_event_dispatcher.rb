@@ -1,26 +1,3 @@
-#
-# QuickRPG (Role Playing Game)---clone from my 2001 Blitz Basic project.
-# 
-# Copyright (C) 2009  Christian Tietze
-# 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
-#     christian.tietze@gmail.com
-#     <http://christiantietze.de/>
-#     <http://divinedominion.art-fx.org/>
-#
-
 require 'singleton'
 require 'observer'
 
@@ -33,10 +10,7 @@ class KeyEventDispatcher
     meth = self.public_instance_methods \
       - self.superclass.public_instance_methods \
       - (self.included_modules.map {|m| m.instance_methods}).flatten
-
-    # TODO migrate to Ruby 1.9 soon!!
-    meth.map!{|m|m.to_sym} if RUBY_VERSION =~ /^1\.8/
-
+    
     meth.each do |m|
       module_eval <<-END_EVAL
         def self.#{m.id2name}(*args, &block)
