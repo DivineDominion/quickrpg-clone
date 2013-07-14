@@ -15,6 +15,15 @@ module QuickRPG
     Z_LAYER   = 0b0000010 # = Z_CHAR so they don't always overlap
     Z_TEXTBOX = 0b1000000
 
+    SUPPORTED_KEYS = [
+      KEY_ESC     = Gosu::KbEscape,
+      KEY_SPACE   = Gosu::KbSpace,
+      KEY_UP      = Gosu::KbUp,
+      KEY_DOWN    = Gosu::KbDown,
+      KEY_LEFT    = Gosu::KbLeft,
+      KEY_RIGHT   = Gosu::KbRight
+    ]
+    
     class << self
       def sprite_file_path(filename)
         File.join(IMAGE_DIR, 'sprites', filename)

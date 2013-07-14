@@ -17,15 +17,6 @@ require_relative 'map'
 require_relative 'script'
 require_relative 'textbox'
 
-$supported_keys = [
-  K_ESC     = Gosu::KbEscape,
-  K_SPACE   = Gosu::KbSpace,
-  K_UP      = Gosu::KbUp,
-  K_DOWN    = Gosu::KbDown,
-  K_LEFT    = Gosu::KbLeft,
-  K_RIGHT   = Gosu::KbRight
-]
-
 module QuickRPG
   class Game < Gosu::Window
     include Gosu, Singleton
@@ -52,7 +43,7 @@ module QuickRPG
       @script = load_script "start"
       @script.execute!
       
-      @key_event_adapter = KeyEventAdapter.new($supported_keys)
+      @key_event_adapter = KeyEventAdapter.new(Common::SUPPORTED_KEYS)
       EventManager::register(KeyAdapter.new)
     end
   

@@ -7,17 +7,17 @@ module QuickRPG
         return if not mvClass(event.state)
       
         case event.key_id
-        when K_UP
+        when Common::KEY_UP
           ev = mvClass(event.state).new(self, :up)
-        when K_DOWN
+        when Common::KEY_DOWN
           ev = mvClass(event.state).new(self, :down)
-        when K_LEFT
+        when Common::KEY_LEFT
           ev = mvClass(event.state).new(self, :left)
-        when K_RIGHT
+        when Common::KEY_RIGHT
           ev = mvClass(event.state).new(self, :right)
-        when K_ESC
+        when Common::KEY_ESC
           ev = QuitEvent.new(self)
-        when K_SPACE
+        when Common::KEY_SPACE
           # TODO interact
         end
       
