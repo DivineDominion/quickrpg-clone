@@ -3,7 +3,7 @@ require 'gosu'
 require_relative 'event'
 require_relative 'event_manager'
 
-require_relative 'key_event_dispatcher' # generates key events
+require_relative 'key_event_dispatcher'
 require_relative 'key_adapter'
 
 require_relative 'fps'
@@ -32,6 +32,8 @@ module QuickRPG
   
     attr_reader :show_debug, :player, :map, :script
   
+    attr_reader :key_event_adapter
+    
     def initialize
       super(Common::SCREEN_WIDTH, Common::SCREEN_HEIGHT, false, 20)
       self.caption = 'QuickRPG'
@@ -49,6 +51,9 @@ module QuickRPG
       @map = nil
       @script = load_script "start"
       @script.execute!
+      
+      @key_event_adapter = KeyEventDispatcher.new($supported_keys)
+      EventManager::register(KeyAdapter.new)
     end
   
     def handle_event(event)
@@ -72,8 +77,12 @@ module QuickRPG
       end
     end
   
-    def button_down(id)
-      puts id
+    def button_down(key_id)
+      @key_event_adapter.button_down(key_id)
+    end
+    
+    def button_up(key_id)
+      @key_event_adapter.button_up(key_id)
     end
     
     def update

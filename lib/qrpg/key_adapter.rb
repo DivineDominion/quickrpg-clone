@@ -1,9 +1,5 @@
 module QuickRPG
   class KeyAdapter
-    def initialize
-      EventManager::register(self)
-    end
-      
     def handle_event(event)
       if event.instance_of? KeyEvent
         ev = nil

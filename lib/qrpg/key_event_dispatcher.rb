@@ -2,71 +2,57 @@ require 'gosu'
 require 'singleton'
 require 'observer'
 
-$supported_keys = [
-  K_ESC     = Gosu::KbEscape,
-  K_SPACE   = Gosu::KbSpace,
-  K_UP      = Gosu::KbUp,
-  K_DOWN    = Gosu::KbDown,
-  K_LEFT    = Gosu::KbLeft,
-  K_RIGHT   = Gosu::KbRight
-]
+require_relative 'event_manager'
 
 module QuickRPG
   class KeyEventDispatcher
-    include Singleton
-  
     # Sets up a shorthand and Maps each object method to a class method, 
     # e.g. write Key::state(id) instead of Key.instance.state(id)
-    MapMethodsToClassMethods = proc do
-      meth = self.public_instance_methods \
-        - self.superclass.public_instance_methods \
-        - (self.included_modules.map {|m| m.instance_methods}).flatten
-    
-      meth.each do |m|
-        module_eval <<-END_EVAL
-          def self.#{m.id2name}(*args, &block)
-            instance.#{m.id2name}(*args, &block)
-          end
-        END_EVAL
-      end
-    end
+    # MapMethodsToClassMethods = proc do
+    #   meth = self.public_instance_methods \
+    #     - self.superclass.public_instance_methods \
+    #     - (self.included_modules.map {|m| m.instance_methods}).flatten
+    # 
+    #   meth.each do |m|
+    #     module_eval <<-END_EVAL
+    #       def self.#{m.id2name}(*args, &block)
+    #         instance.#{m.id2name}(*args, &block)
+    #       end
+    #     END_EVAL
+    #   end
+    # end
+#        MapMethodsToClassMethods.call
   
-    def initialize
-      raise "Setup $wnd which must be instance_of? Gosu::Window" unless defined? $wnd
+    attr_reader :keys
     
-      EventManager::register(self)
-      @keys = Array.new(256, :released) 
-    
-      # Set up supported keys if not done already
-      $supported_keys ||= (0..255)
-    end
-  
-    def handle_event(event)
-      if event.instance_of? TickEvent
-        $supported_keys.each do |id|
-          old_state = state(id)
+    def initialize(supported_keys)
+      @keys = {}
       
-          if $wnd.button_down?(id)
-            button_down(id)
-          else
-            button_up(id)
-          end
-        
-          if state(id) != old_state
-            EventManager.post(KeyEvent.new(self, state(id), id))
-          end
-        end
+      supported_keys.each do |key|
+        @keys[key] = :released
       end
     end
   
     def button_down(id)
+      old_state = @keys[id]
+      
       @keys[id] = :down  if hit? id
       @keys[id] = :hit   if released? id
+      
+      new_state = @keys[id]
+      
+      key_changed(id, new_state) if old_state != new_state
     end 
   
     def button_up(id)
+      old_state = @keys[id]
+      
       @keys[id] = :released  if up? id
       @keys[id] = :up        if down? id
+      
+      new_state = @keys[id]
+      
+      key_changed(id, new_state) if old_state != new_state
     end
 
     def hit?(id)
@@ -88,7 +74,9 @@ module QuickRPG
     def state(id)
       @keys[id]
     end
-  
-    MapMethodsToClassMethods.call
+    
+    def key_changed(key, changed_to)
+      EventManager.post(KeyEvent.new(self, changed_to, key))
+    end
   end
 end
