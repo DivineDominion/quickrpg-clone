@@ -24,10 +24,10 @@ $supported_keys = [
 ]
 
 require_relative 'Event'
-require_relative 'EventManager'
+require_relative 'event_manager'
 
-require_relative 'KeyEventDispatcher' # generates key events
-require_relative 'KeyAdapter'
+require_relative 'key_event_dispatcher' # generates key events
+require_relative 'key_adapter'
 
 require_relative 'fps'
 
