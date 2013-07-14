@@ -3,7 +3,7 @@ require 'gosu'
 require_relative 'event'
 require_relative 'event_manager'
 
-require_relative 'key_event_dispatcher'
+require_relative 'key_event_adapter'
 require_relative 'key_adapter'
 
 require_relative 'fps'
@@ -52,7 +52,7 @@ module QuickRPG
       @script = load_script "start"
       @script.execute!
       
-      @key_event_adapter = KeyEventDispatcher.new($supported_keys)
+      @key_event_adapter = KeyEventAdapter.new($supported_keys)
       EventManager::register(KeyAdapter.new)
     end
   
