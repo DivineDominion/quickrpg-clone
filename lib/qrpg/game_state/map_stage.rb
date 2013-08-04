@@ -1,15 +1,17 @@
 require_relative 'stage'
 
-module QuickRPG::GameState
-  class MapStage < Stage
-    attr_accessor :map
+module QuickRPG
+  module GameState
+    class MapStage < Stage
+      attr_accessor :map
     
-    def initialize(map: nil)
-      @map = map
-    end
+      def initialize(map: nil)
+        @map = map
+      end
     
-    def draw
-      map.draw if map
+      def draw
+        map.draw if map
+      end
     end
   end
 end
