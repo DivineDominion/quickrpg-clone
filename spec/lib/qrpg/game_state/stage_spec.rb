@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'support/gameloopable_interface.rb'
 
 describe QuickRPG::GameState::Stage do
   let(:stage) { described_class.new }
@@ -19,13 +20,7 @@ describe QuickRPG::GameState::Stage do
     it "responds to curtain_down" do
       expect(stage).to respond_to(:curtain_down)
     end
-    
-    it "responds to update" do
-      expect(stage).to respond_to(:update)
-    end
-    
-    it "responds to draw" do
-      expect(stage).to respond_to(:draw)
-    end
   end
+  
+  it_behaves_like "a game loop-able interface"
 end
