@@ -13,7 +13,7 @@ module QuickRPG::GameState
     end
    
     def visible?
-      visible
+      !!visible # double-negation ensures boolean
     end
    
     def update
