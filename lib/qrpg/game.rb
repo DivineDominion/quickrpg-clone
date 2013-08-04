@@ -1,5 +1,8 @@
 require 'gosu'
 
+require_relative 'game_state/director'
+require_relative 'game_state/map_stage'
+
 require_relative 'event'
 require_relative 'event_manager'
 
@@ -23,9 +26,11 @@ module QuickRPG
   class Game < Gosu::Window
     include Gosu, Singleton
   
-    attr_reader :show_debug, :player, :map, :script
+    attr_reader :show_debug, :player, :script
   
     attr_reader :key_event_adapter
+    
+    attr_accessor :director
     
     def initialize
       super(Common::SCREEN_WIDTH, Common::SCREEN_HEIGHT, false, 20)
@@ -41,7 +46,9 @@ module QuickRPG
     
       @player = Player.new(Gosu::Image::load_tiles(self, Common::sprite_file_path("cutter.png"), 16, 16, true))
     
-      @map = nil
+      map_stage = QuickRPG::GameState::MapStage.new
+      @director = QuickRPG::GameState::Director.new(state: map_stage)
+      
       @script = load_script "start"
       @script.execute!
       
@@ -56,7 +63,7 @@ module QuickRPG
       if event.instance_of? TickEvent
         #update_controls
     
-        update_map unless Textbox::open?
+        director.update unless Textbox::open?
       elsif event.instance_of? CharMoveRequest
         unless @player.animating?
           move_player(event.direction) 
@@ -89,7 +96,7 @@ module QuickRPG
     def draw
       draw_background if $show_debug
 
-      draw_map
+      director.draw
   
       Textbox::draw
   
@@ -99,8 +106,20 @@ module QuickRPG
       $screen.nil?
     end
   
+    def map=(new_map)
+      # TODO workaround wrapper: move to director
+      puts "Map Set!\n"
+      puts caller
+      director.current_state.map = new_map
+    end
+    
+    def map
+      # TODO workaround wrapper: move to director
+      director.current_state.map
+    end
+    
     def use_map(map)
-      @map = map
+      self.map = map
     end
   
     def load_script(filename)
@@ -124,44 +143,6 @@ module QuickRPG
   
   protected
   
-    def update_controls
-      raise "obsolete"
-    
-      if Key::hit?(KbEscape)
-        close
-      end
-    
-      if Key::hit?(KbF)
-        $show_fps = !$show_fps
-      end
-    
-      if Key::hit?(KbD)
-        $show_debug = !$show_debug
-      end
-  
-      if Textbox::open?
-        if Key::hit?(KbSpace)
-          Textbox::close
-        
-          # Resume execution after finishing the text box
-          run_script
-        end
-      else      
-        # Control player movement
-        if has_player_control? && !run_script
-          if Key::down?(KbRight)
-            move_player(:right)
-          elsif Key::down?(KbLeft)
-            move_player(:left)
-          elsif Key::down?(KbUp)
-            move_player(:up)
-          elsif Key::down?(KbDown)
-            move_player(:down)
-          end
-        end
-      end
-    end
-  
     #
     # Returns true if script is still running, i.e. the player shall not 
     # re-gain control if neccessary.
@@ -184,26 +165,18 @@ module QuickRPG
     end
   
     def move_player(dir)
-      unless @map.blocked_in_dir_from?(dir, @player.x, @player.y)
-        @map.attempt_scrolling(dir)
+      unless map.blocked_in_dir_from?(dir, @player.x, @player.y)
+        map.attempt_scrolling(dir)
         @player.walk_in(dir)
       else
         @player.turn_to(dir)
       end
     end
-  
-    def update_map
-      @map.update unless @map.nil?
-    end
-  
+    
     def draw_background
       c = 0xFF808080
       draw_quad 0, 0, c, Common::SCREEN_WIDTH, 0, c, 0, Common::SCREEN_HEIGHT, c, Common::SCREEN_WIDTH, Common::SCREEN_HEIGHT, c
     end  
-  
-    def draw_map
-      @map.draw unless @map.nil?
-    end
   
     def draw_rules
       (1..15).each { |y| draw_line 0, y*16, 0x40000000, 320, y*16, 0x50000000, 10000}

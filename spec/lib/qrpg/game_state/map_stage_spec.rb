@@ -15,4 +15,16 @@ describe QuickRPG::GameState::MapStage do
       map_stage.draw
     end
   end
+  
+  describe "updating" do
+    let(:map) { double() }
+    
+    it "updates the map" do
+      map_stage = described_class.new(map: map)
+      
+      expect(map).to receive(:update)
+      
+      map_stage.update
+    end
+  end
 end

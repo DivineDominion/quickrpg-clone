@@ -8,7 +8,11 @@ module QuickRPG
       def initialize(map: nil)
         @map = map
       end
-    
+      
+      def update
+        map.update if map
+      end
+      
       def draw
         map.draw if map
       end
