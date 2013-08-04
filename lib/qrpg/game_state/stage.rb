@@ -17,9 +17,11 @@ module QuickRPG::GameState
     end
    
     def update
+      raise NotImplementedError
     end
     
     def draw
+      raise NotImplementedError
     end
     
     private
