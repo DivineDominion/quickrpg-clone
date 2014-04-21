@@ -6,9 +6,14 @@ require_relative 'game_state/map_stage'
 require_relative 'event/event'
 require_relative 'event/event_manager'
 
+require_relative 'keyboard_control/key_consumers'
 require_relative 'keyboard_control/key_event_adapter'
 require_relative 'keyboard_control/key_event_broadcaster'
 require_relative 'keyboard_control/key_adapter'
+
+require_relative 'textbox_controller'
+require_relative 'player_movement'
+require_relative 'quit_controller'
 
 require_relative 'fps'
 

@@ -1,16 +1,12 @@
 require 'spec_helper'
-require 'support/gameloopable_interface.rb'
+require 'support/handles_key_events_interface.rb'
+require 'support/can_become_a_chain_link_interface.rb'
 
 describe QuickRPG::TextboxController do
   let(:controller) { described_class.new }
-  let(:next_in_chain) { double() }
   
   it_should_behave_like "it handles key events"
   it_should_behave_like "can become a chain link"
-  
-  before(:each) do
-    controller.next_responder = next_in_chain
-  end
   
   describe "initialization" do
     it "starts inactive" do
@@ -32,6 +28,11 @@ describe QuickRPG::TextboxController do
   
   describe "absorbing key events" do
     let(:key_event) { double() }
+    let(:next_in_chain) { double() }
+    
+    before(:each) do
+      controller.next_responder = next_in_chain
+    end
     
     context "when a textbox is visible" do
       let(:textbox) { double() }
@@ -57,11 +58,23 @@ describe QuickRPG::TextboxController do
         # precondition
         expect(controller).not_to be_active
       end
-    
-      it "forwards key events to the next in chain" do
-        expect(next_in_chain).to receive(:handle_key_event).with(key_event)
       
-        controller.handle_key_event(key_event)
+      context "when there's a next responder" do
+        it "forwards key events to the next in chain" do
+          expect(next_in_chain).to receive(:handle_key_event).with(key_event)
+      
+          controller.handle_key_event(key_event)
+        end
+      end
+      
+      context "when it's the last responder in chain" do
+        let(:next_in_chain) { nil }
+        
+        it "lets it drop" do
+          expect {
+            controller.handle_key_event(key_event)
+          }.not_to raise_exception
+        end
       end
     end
   end

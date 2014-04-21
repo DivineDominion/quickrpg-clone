@@ -42,14 +42,18 @@ describe QuickRPG::KeyEventBroadcaster do
 
   it_behaves_like "a keyboard listener interface"
   
-  before(:each) do
-    broadcaster.event_manager = event_manager
+  describe "initialization" do
+    it "comes with an event manager" do
+      expect(broadcaster.event_manager).not_to be_nil
+    end
   end
   
   describe "pressing a button" do
     let(:key_id) { 1234 }
 
     before(:each) do
+      broadcaster.event_manager = event_manager
+      
       broadcaster.button_down(key_id)
     end
     
@@ -90,7 +94,8 @@ describe QuickRPG::KeyEventBroadcaster do
     let(:key_id) { 678 }
 
     before(:each) do
-      broadcaster.key_event_adapter = delegate
+      broadcaster.event_manager = event_manager
+      
       broadcaster.button_up(key_id)
     end
     

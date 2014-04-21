@@ -36,9 +36,24 @@ describe "Dialogue handling" do
   
   context "when a dialogue script is invoked" do
     let(:dialogue) {  }
-    describe "arrow keys" do
-      it "doesn't move the player"
+    
+    before(:each) do
+      textbox = double()
+      textbox_controller.show(textbox)
     end
+    
+    describe "arrow key" do
+      before(:each) do
+        allow(player).to receive(:handle_key_event)
+      
+        fire_down_arrow
+      end
+      
+      it "doesn't move the player" do
+        expect(player).not_to have_received(:handle_key_event) 
+      end
+    end
+    
     describe "action key" do
       it "continues the dialogue"
       describe "action key" do

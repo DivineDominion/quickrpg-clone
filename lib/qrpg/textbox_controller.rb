@@ -1,19 +1,25 @@
+require_relative 'keyboard_control/handles_key_events_in_chain'
+
 module QuickRPG
   class TextboxController
-    attr_accessor :next_responder
+    include HandlesKeyEventsInChain
     
     def show(textbox)
       @textbox = textbox
     end
     
     def active?
+      has_text_box?
+    end
+    
+    def has_text_box?
       !@textbox.nil?
     end
     
     def handle_key_event(event)
       if active?
       else
-        @next_responder.handle_key_event(event)
+        forward_key_event(event)
       end
     end
   end
