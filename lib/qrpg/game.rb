@@ -3,13 +3,12 @@ require 'gosu'
 require_relative 'game_state/director'
 require_relative 'game_state/map_stage'
 
-require_relative 'event'
-require_relative 'event_manager'
+require_relative 'event/event'
+require_relative 'event/event_manager'
 
-require_relative 'key_event_adapter'
-require_relative 'key_event_broadcaster'
-
-require_relative 'key_adapter'
+require_relative 'keyboard_control/key_event_adapter'
+require_relative 'keyboard_control/key_event_broadcaster'
+require_relative 'keyboard_control/key_adapter'
 
 require_relative 'fps'
 

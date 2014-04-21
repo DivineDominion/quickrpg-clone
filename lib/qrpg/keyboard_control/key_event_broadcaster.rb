@@ -1,6 +1,6 @@
 # = key_event_dispatcher.rb - Broadcasts key state changes
 
-require_relative 'event_manager'
+require_relative '../event/event_manager'
 require_relative 'key_event_adapter'
 
 module QuickRPG
