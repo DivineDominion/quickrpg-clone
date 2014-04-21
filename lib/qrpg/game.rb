@@ -36,7 +36,7 @@ module QuickRPG
       super(Common::SCREEN_WIDTH, Common::SCREEN_HEIGHT, false, 20)
       self.caption = 'QuickRPG'
     
-      EventManager::register(self)
+      EventManager::add_listener(self)
       @keep_going = true
     
       $font = Font.new(self, 'Monaco', 12)
@@ -55,8 +55,12 @@ module QuickRPG
       
       @key_event_adapter = KeyEventBroadcaster.new(
         KeyEventAdapter.new(Common::SUPPORTED_KEYS))
-        
-      EventManager::register(KeyAdapter.new)
+      
+      @key_consumers = KeyConsumers.new
+      @key_consumers << QuitController.new
+      @key_consumers << TextboxController.new
+      @key_consumers << PlayerMovement.new
+      EventManager::add_listener(@key_consumers)
     end
   
     def handle_event(event)

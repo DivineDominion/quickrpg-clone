@@ -5,6 +5,7 @@ require_relative 'key_event_adapter'
 
 module QuickRPG
   class KeyEventBroadcaster
+    attr_accessor :event_manager
     attr_reader :key_event_adapter
   
     def initialize(key_event_adapter = KeyEventAdapter.new)
@@ -34,7 +35,11 @@ module QuickRPG
     end
   
     def key_changed(key_id, changed_to)
-      EventManager.post(KeyEvent.new(self, changed_to, key_id))
+      event_manager.post(KeyEvent.new(self, changed_to, key_id))
+    end
+    
+    def event_manager
+      @event_manager ||= EventManager.default_manager
     end
   end
 end

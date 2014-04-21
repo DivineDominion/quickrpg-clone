@@ -45,7 +45,7 @@ module QuickRPG
       end
     
       if state == :finished
-        EventManager.post(CharTileMoveDone.new(self, @direction))
+        EventManager::post(CharTileMoveDone.new(self, @direction))
       end
     
       return [@x, @y]
