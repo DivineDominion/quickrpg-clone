@@ -14,6 +14,8 @@ describe QuickRPG::PlayerMovement do
       controller.next_responder = next_in_chain
     end
     
+    it "posts move event"
+    
     context "without next in chain" do
       let(:next_in_chain) { nil }
       
@@ -33,4 +35,6 @@ describe QuickRPG::PlayerMovement do
       end
     end
   end
+  
+  describe "forwarding key events"
 end

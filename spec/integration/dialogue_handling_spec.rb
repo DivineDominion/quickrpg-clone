@@ -11,7 +11,11 @@ describe "Dialogue handling" do
   def fire_down_arrow
     down_key_id = QuickRPG::Common::KEY_DOWN
     key_event_broadcaster.button_down(down_key_id)
-    # key_event_broadcaster.button_up(down_key_id)
+  end
+  
+  def fire_action_key
+    action_key_id = QuickRPG::Common::KEY_SPACE
+    key_event_broadcaster.button_down(action_key_id)
   end
   
   before(:each) do
@@ -35,11 +39,12 @@ describe "Dialogue handling" do
   end
   
   context "when a dialogue script is invoked" do
-    let(:dialogue) {  }
+    let(:dialogue_handler) { QuickRPG::DialogueHandler.new }
+    let(:dialogue) { double(:textbox => textbox, :advance => nil) }
+    let(:textbox) { double() }
     
     before(:each) do
-      textbox = double()
-      textbox_controller.show(textbox)
+      dialogue_handler.handle(dialogue, textbox_controller)
     end
     
     describe "arrow key" do
@@ -55,7 +60,22 @@ describe "Dialogue handling" do
     end
     
     describe "action key" do
-      it "continues the dialogue"
+      before(:each) do
+        allow(player).to receive(:handle_key_event)
+      
+        fire_action_key
+      end
+      
+      it "continues the dialogue" do
+        # TODO keep dialogue ref in handler, 
+        # TODO handler.textbox_closed on action key in textbox
+        expect(dialogue).to have_received(:advance)
+      end
+      
+      it "doesn't let the player interact" do
+        expect(player).not_to have_received(:handle_key_event) 
+      end
+      
       describe "action key" do
         it "closes the dialogue"
         describe "arrow keys" do
