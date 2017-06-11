@@ -45,10 +45,10 @@ module QuickRPG
     
       $font = Font.new(self, 'Monaco', 12)
     
-      Textbox::textbox  = Gosu::Image.new(self, Common::image_file_path("menu.png"), true)
-      Textbox::font     = Gosu::Image::load_tiles(self, Common::image_file_path("font.png"), 6, 6, true)
+      Textbox::textbox  = Gosu::Image.new(Common::image_file_path("menu.png"), :tileable => true)
+      Textbox::font     = Gosu::Image::load_tiles(Common::image_file_path("font.png"), 6, 6, :tileable => true)
     
-      @player = Player.new(Gosu::Image::load_tiles(self, Common::sprite_file_path("cutter.png"), 16, 16, true))
+      @player = Player.new(Gosu::Image::load_tiles(Common::sprite_file_path("cutter.png"), 16, 16, :tileable => true))
     
       map_stage = QuickRPG::GameState::MapStage.new
       @director = QuickRPG::GameState::Director.new(state: map_stage)

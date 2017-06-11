@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 
-gem 'gosu', '~> 0.7.47'
+gem 'gosu'
 
 group :development do
   gem 'rspec', '~> 2.14'
