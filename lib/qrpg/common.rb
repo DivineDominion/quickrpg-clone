@@ -6,7 +6,7 @@ module QuickRPG
     SCRIPT_DIR = File.join(__dir__, '..', '..', 'data')
     MAP_DIR = File.join(__dir__, '..', '..', 'maps')
 
-    SCREEN_WIDTH = 320
+    SCREEN_WIDTH = 425
     SCREEN_HEIGHT = 240
     TILE_SIZE = 16
     SCREEN_WIDTH_TILE = SCREEN_WIDTH / TILE_SIZE
