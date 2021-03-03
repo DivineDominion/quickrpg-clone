@@ -26,7 +26,7 @@ module QuickRPG
     end
   
     def draw(x, y, color)
-      $font.draw("FPS: " + @fps.to_s, x, y, 100.0, 1, 1, color)
+      $font.draw_text("FPS: " + @fps.to_s, x, y, 100.0, 1, 1, color)
     end
   end
 end

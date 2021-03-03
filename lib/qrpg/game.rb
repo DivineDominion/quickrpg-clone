@@ -43,8 +43,8 @@ module QuickRPG
       EventManager::add_listener(self)
       @keep_going = true
     
-      $font = Font.new(self, 'Monaco', 12)
     
+      $font = Gosu::Font.new(14, name: 'Arial')
       Textbox::textbox  = Gosu::Image.new(Common::image_file_path("menu.png"), :tileable => true)
       Textbox::font     = Gosu::Image::load_tiles(Common::image_file_path("font.png"), 6, 6, :tileable => true)
     

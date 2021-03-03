@@ -5,13 +5,13 @@ gem 'rake'
 gem 'gosu'
 
 group :development do
-  gem 'rspec', '~> 2.14'
+  gem 'rspec'
   gem 'fuubar' # rspec style
-  
+
   gem 'guard-rspec'
-  gem 'rb-fsevent', '~> 0.9'
+  gem 'rb-fsevent'
   gem 'terminal-notifier-guard'
-  
-  gem 'spork', '~> 0.9'
-  gem 'guard-spork', '~> 1.4'
+
+  gem 'spork'
+  gem 'guard-spork'
 end
